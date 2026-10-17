@@ -17,29 +17,24 @@
 /// A. Return (wrapping, checked, saturating, overflowing) addition results.
 /// Each field must use its corresponding method, with profile-independent behavior.
 fn addition_policies(a: u8, b: u8) -> (u8, Option<u8>, u8, (u8, bool)) {
-    (
-        a.wrapping_add(b),
-        a.checked_add(b),
-        a.saturating_add(b),
-        a.overflowing_add(b),
-    )
+    todo!("A: apply each addition policy explicitly")
 }
 
 /// B. Multiply using the strict method: overflow must panic in EVERY profile.
 fn strict_product(a: u16, b: u16) -> u16 {
-    a.strict_mul(b)
+    todo!("B: multiply with overflow checks in every profile")
 }
 
 /// C. Average any two i32 values without overflow, rounding toward zero.
 /// Use a wider intermediate or the built-in midpoint method.
 fn midpoint(a: i32, b: i32) -> i32 {
-    a.midpoint(b)
+    todo!("C: average without overflow, rounding toward zero")
 }
 
 /// D. Return (checked shift-left, wrapping shift-left).
 /// The policy applies to the DISTANCE; this is not checked multiplication.
 fn left_shift_policies(value: u8, distance: u32) -> (Option<u8>, u8) {
-    (value.checked_shl(distance), value.wrapping_shl(distance))
+    todo!("D: apply checked and wrapping shift-distance policies")
 }
 
 #[cfg(test)]

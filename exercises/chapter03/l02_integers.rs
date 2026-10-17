@@ -15,24 +15,23 @@
 /// A. Express decimal 170 in decimal, hexadecimal, octal, and binary order.
 /// Write four literals using the appropriate prefixes; don't repeat decimal 170.
 fn same_number_four_bases() -> (u16, u16, u16, u16) {
-    // todo!("A: read and write integer literal bases")
-    (170, 0xaa, 0o252, 0b10101010)
+    todo!("A: read and write integer literal bases")
 }
 
 /// B. Keep only the lowest eight bits. This is deliberate truncation,
 /// not a checked numeric conversion. Use a cast.
 fn low_byte(value: u32) -> u8 {
-    value as u8
+    todo!("B: cast to keep only the lowest eight bits")
 }
 
 /// C. Interpret the same eight bits as a signed integer using a cast.
 fn signed_view(value: u8) -> i8 {
-    value as i8
+    todo!("C: reinterpret the same bits as a signed integer")
 }
 
 /// D. Count the one bits with an integer method, not a hand-written loop.
 fn set_bits(value: u16) -> u32 {
-    value.count_ones()
+    todo!("D: count one bits with an integer method")
 }
 
 #[cfg(test)]

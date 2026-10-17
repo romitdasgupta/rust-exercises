@@ -18,19 +18,13 @@
 /// Practice inference: use `Vec::new`, a loop over `0..3`, and `push`.
 /// Inputs are at most 1_000; overflow is not part of this task.
 fn packet_lengths(header: u16) -> Vec<u16> {
-    // todo!("A: let the return type constrain the vector and arithmetic")
-    let mut v = Vec::new();
-    for i in 0..3 {
-        v.push(header + i * 16);
-    }
-    v
+    todo!("A: let the return type constrain the vector and arithmetic")
 }
 
 /// B. Compute the absolute value of -17 with the `abs` method.
 /// Make the literal's type explicit; do not just return the answer.
 fn absolute_distance() -> i32 {
-    // todo!("B: resolve the numeric method's receiver type")
-    (-17i32).abs()
+    todo!("B: resolve the numeric method's receiver type")
 }
 
 #[cfg(test)]

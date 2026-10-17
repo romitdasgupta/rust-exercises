@@ -7,7 +7,7 @@ The book is your reference; these exercises are a place to practice and explain 
 
 ## Start here
 
-Open [lesson 1](l01_inference.rs). Read its prediction prompts **before** running anything, then inspect its two function bodies. This checkout already includes implementations for lesson 1; review them against the prompts or redo them from the contracts. Replace remaining `todo!()` bodies as you progress. Check your work with:
+Open [lesson 1](l01_inference.rs). Read its prediction prompts **before** running anything, then implement its `todo!()` bodies from the contracts. Replace each lesson's `todo!()` bodies as you progress. Check your work with:
 
 ```sh
 cargo test --test chapter03 l01_
