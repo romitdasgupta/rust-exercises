@@ -6,9 +6,29 @@ Chapters 4–24 add **167 guided lessons and 396 core implementation tasks**, pl
 
 The exercises are original practice problems, not a reproduction of the book. Read the corresponding chapter alongside them. Each chapter has its own guide, lesson files, progressive hints, tests, compiler experiments, coverage map, and capstone.
 
+## Fresh clone setup
+
+Install Git and [Rust through rustup](https://www.rust-lang.org/tools/install). The repository pins Rust **1.99.0** and uses edition 2024. Rustup installs the pinned toolchain when you first run Cargo in this directory. Install the formatting component explicitly if your rustup profile does not include it.
+
+Replace `<owner>` and `<repository>` with the GitHub repository's actual owner and name:
+
+```sh
+git clone https://github.com/<owner>/<repository>.git
+cd <repository>
+rustup toolchain install 1.99.0 --profile minimal --component rustfmt
+cargo test --locked --offline --all-targets --no-run
+cargo test --locked --offline --release --all-targets --no-run
+cargo fmt --all -- --check
+cargo test --test chapter03 -- --list
+```
+
+The build commands compile the exercises without executing unfinished functions. No external crates or network access are needed for these core checks once Rust is installed. Run all commands in this guide and the chapter guides from the repository root unless a lab says otherwise.
+
+This is a practice repository with partially completed Chapter 3 work and unfinished exercises throughout. Some tests already pass; others intentionally fail at `todo!`. Start by listing tests, then work through one lesson at a time.
+
 ## Begin or continue
 
-Start with [Chapter 3: Fundamental Types](exercises/chapter03/README.md), or continue with [Chapter 4: Ownership and Moves](exercises/chapter04/README.md). Your existing Chapter 3 implementations remain in place.
+Start with [Chapter 3: Fundamental Types](exercises/chapter03/README.md), or continue with [Chapter 4: Ownership and Moves](exercises/chapter04/README.md).
 
 1. Open a chapter guide and follow its lesson order.
 2. Write your predictions before running an example or looking up an answer.
@@ -23,7 +43,7 @@ Start with [Chapter 3: Fundamental Types](exercises/chapter03/README.md), or con
 6. Answer the explanation questions and add an edge case of your own before checking the lesson off.
 7. Finish the capstone, then repeat it later from the contract without consulting your previous implementation.
 
-Send me a lesson number, your predictions, and your code or test output for guided review. The [hint directory](HINTS.md) links to two progressive hints per lesson.
+For review with a study partner or tutor, share the lesson number, your predictions, and your code or test output. The [hint directory](HINTS.md) links to two progressive hints per lesson.
 
 ## Chapters
 
@@ -77,11 +97,11 @@ cargo fmt --check
 
 Unimplemented functions deliberately panic at `todo!()`. A failing exercise is the starting state, not a broken installation. Do not run the whole book's tests expecting a green result before completing the exercises. Compiler labs deliberately include snippets that should fail to compile; keep those experiments in the scratch files or isolated lab projects and restore them afterward.
 
-This workspace currently uses Rust 1.99 and edition 2024. Some lessons intentionally explore edition rules and recent features described in the third edition. Compiler diagnostics and opaque type names may differ across toolchains; test contracts focus on behavior rather than exact diagnostic wording.
+The supported toolchain is Rust 1.99.0, pinned in `rust-toolchain.toml`; the package uses edition 2024. Some lessons intentionally explore edition rules and recent features described in the third edition. Compiler diagnostics and opaque type names may differ across toolchains; test contracts focus on behavior rather than exact diagnostic wording.
 
 ## Your main.rs playground
 
-`src/main.rs` is your personal experiment file. Run it with `cargo run --features playground`. The feature is off during the chapter tests, so an intentional compiler error in the playground does not block your exercise checks. Its contents are preserved. Scratch examples are compiled by `--all-targets`, so repair intentional scratch errors before running that broad check.
+`src/main.rs` is your personal experiment file. Run it with `cargo run --features playground`. The feature is off during the chapter tests, so an intentional compiler error in the playground does not block your exercise checks. Scratch examples are compiled by `--all-targets`, so repair intentional scratch errors before running that broad check.
 
 ## Labs that need another tool or crate
 
@@ -107,8 +127,12 @@ A green test result checks the required behavior. It does not prove that you use
 
 ## Validation scope
 
-All 22 chapter starter targets (3–24) and their scratch examples compile offline in debug and release profiles. Complete temporary reference implementations for every new chapter pass their tests in both profiles; solutions are kept outside the learner files. The isolated random, regex, and external macro-consumer packages were also checked against reference implementations. All newly added Rust files pass rustfmt checks. Formatting the whole project also includes your existing in-progress code.
+A clean starter checkout should compile all 22 chapter targets (3–24) and their scratch examples offline in debug and release profiles using the fresh-clone commands above. Formatting is checked separately. The isolated random, regex, and external macro-consumer packages have their own manifests and are not included in the root Cargo checks. The first two need a dependency download before offline builds work. The [starter CI workflow](.github/workflows/ci.yml) checks formatting and compiles the core (including the playground) and all three extension packages in both profiles on Linux, macOS, and Windows; it deliberately does not execute unfinished exercises.
 
-The unfinished new tests were run to confirm they fail normally at TODOs, without false-positive panic tests, hangs, or cleanup aborts. Tests do not prove that an unsafe abstraction is sound for every possible caller: its written safety argument is part of the exercise.
+Running unfinished tests is expected to fail. Compilation checks establish that a learner can start; they do not establish that unfinished implementations are correct. No complete reference solution is shipped. Tests also do not prove that an unsafe abstraction is sound for every possible caller: its written safety argument is part of the exercise.
 
-Compiler experiments and the assigned Cargo/process, Tokio, Mio, Rayon, compression, procedural-macro, generic gap-buffer, Miri, native C/libgit2, and platform-specific projects are manual practice. Those complete extension projects were not executed during creation. Their prerequisites, acceptance criteria, and validation limits are stated in the chapter guides or lab instructions.
+Compiler experiments and the assigned Cargo/process, Tokio, Mio, Rayon, compression, procedural-macro, generic gap-buffer, Miri, native C/libgit2, and platform-specific projects are manual practice. They are outside the automated core checks. Their prerequisites and acceptance criteria are stated in the chapter guides or lab instructions.
+
+## License
+
+Licensed under the [MIT License](LICENSE).

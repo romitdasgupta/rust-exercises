@@ -17,7 +17,12 @@
 /// A. Return (wrapping, checked, saturating, overflowing) addition results.
 /// Each field must use its corresponding method, with profile-independent behavior.
 fn addition_policies(a: u8, b: u8) -> (u8, Option<u8>, u8, (u8, bool)) {
-    (a.wrapping_add(b), a.checked_add(b), a.saturating_add(b), a.overflowing_add(b))
+    (
+        a.wrapping_add(b),
+        a.checked_add(b),
+        a.saturating_add(b),
+        a.overflowing_add(b),
+    )
 }
 
 /// B. Multiply using the strict method: overflow must panic in EVERY profile.

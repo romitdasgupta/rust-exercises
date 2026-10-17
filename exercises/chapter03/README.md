@@ -7,7 +7,7 @@ The book is your reference; these exercises are a place to practice and explain 
 
 ## Start here
 
-Open [lesson 1](l01_inference.rs). Read its prediction prompts **before** running anything, then replace its two `todo!()` bodies. Check your work with:
+Open [lesson 1](l01_inference.rs). Read its prediction prompts **before** running anything, then inspect its two function bodies. This checkout already includes implementations for lesson 1; review them against the prompts or redo them from the contracts. Replace remaining `todo!()` bodies as you progress. Check your work with:
 
 ```sh
 cargo test --test chapter03 l01_
@@ -28,7 +28,7 @@ Leave the tests intact. You can add cases of your own.
 
 If stuck, start with the relevant section of the chapter. Then open [HINTS.md](HINTS.md), which has two levels of hints per lesson. There is no answer key in the exercise files.
 
-For guided review, send me the lesson number, your predictions and explanations, and your implementation or test failure. I can review the reasoning and give the next useful hint.
+For guided review with a study partner or tutor, share the lesson number, your predictions and explanations, and your implementation or test failure.
 
 ## Route through the chapter
 
@@ -72,7 +72,7 @@ cargo fmt --check
 ```
 
 The release run matters: explicit overflow methods should keep the same behavior across build profiles.
-The exercises use the chapter's `strict_mul` method; this workspace has Rust 1.99 installed.
+The exercises use the chapter's `strict_mul` method; use the repository's pinned Rust 1.99.0 toolchain (see [setup instructions](../../README.md#fresh-clone-setup)).
 No extra crates or network access are needed.
 
 ## Compiler labs

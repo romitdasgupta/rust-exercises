@@ -21,7 +21,7 @@ fn packet_lengths(header: u16) -> Vec<u16> {
     // todo!("A: let the return type constrain the vector and arithmetic")
     let mut v = Vec::new();
     for i in 0..3 {
-        v.push(header + i*16);
+        v.push(header + i * 16);
     }
     v
 }

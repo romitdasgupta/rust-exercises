@@ -1,6 +1,6 @@
 fn main() {
     let x = 250u8;
-    let y= 8;
+    let y = 8;
     println!("{}", add(x, y));
 }
 

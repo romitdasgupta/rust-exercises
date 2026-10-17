@@ -1,7 +1,9 @@
 [package]
+license = "MIT"
 name="chapter16_random_lab"
 version="0.0.0"
 edition="2024"
+rust-version = "1.99"
 
 [workspace]
 

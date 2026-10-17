@@ -1,0 +1,41 @@
+name: Starter checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Compile starters (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install pinned Rust toolchain
+        run: rustup show active-toolchain
+      - name: Check formatting
+        run: |
+          cargo fmt --all --check
+          cargo fmt --manifest-path exercises/chapter16/random-lab/Cargo.toml --all --check
+          cargo fmt --manifest-path exercises/chapter17/regex-lab/Cargo.toml --all --check
+          cargo fmt --manifest-path exercises/chapter22/export_lab/Cargo.toml --all --check
+      # Unfinished exercises intentionally panic. Compile their tests without running them.
+      - name: Compile core starters and playground in both profiles
+        run: |
+          cargo test --locked --offline --all-targets --all-features --no-run
+          cargo test --locked --offline --release --all-targets --all-features --no-run
+      - name: Compile extension starters in both profiles
+        run: |
+          for manifest in exercises/chapter16/random-lab/Cargo.toml exercises/chapter17/regex-lab/Cargo.toml exercises/chapter22/export_lab/Cargo.toml; do
+            cargo test --manifest-path "$manifest" --locked --all-targets --no-run
+            cargo test --manifest-path "$manifest" --locked --release --all-targets --no-run
+          done

@@ -1,6 +1,6 @@
 # Runtime-specific async projects
 
-The standard-library lessons practice futures and borrowing. They do not exercise Tokio APIs. Complete these isolated projects to cover the chapter's runtime-specific material. Create a new temporary Cargo package, add current `tokio` with the required rt-multi-thread, macros, sync, time, io-util, net features and `tokio-util` for CancellationToken, and follow their official documentation. Keep dependencies out of the root exercise package. Use only in-memory fixtures or loopback sockets; no public crawling.
+The standard-library lessons practice futures and borrowing. They do not exercise Tokio APIs. Complete these isolated projects to cover the chapter's runtime-specific material. Create a new temporary Cargo package, add current `tokio` with the required `rt-multi-thread`, `macros`, `sync`, `time`, `io-util`, `net`, and `fs` features and `tokio-util` with its `rt` feature for CancellationToken, and follow their official documentation. Keep dependencies out of the root exercise package. Use only in-memory fixtures or loopback sockets; no public crawling.
 
 ## Spawn bounds, outgoing links, and bounded crawling
 

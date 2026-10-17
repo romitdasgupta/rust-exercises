@@ -62,4 +62,4 @@ Redo the capstone from its contract in a later session. Explain one design trade
 
 ## Validation scope
 
-The dependency-free starter target compiles on the installed Rust 1.99 toolchain. Temporary complete reference implementations pass the chapter tests in debug and release; reference answers are not saved in this exercise directory. External-runtime, procedural-macro, native-library, platform-specific, and Miri extension projects are assigned practice, and were not executed as part of this validation.
+Use the repository's pinned Rust 1.99.0 toolchain and run commands from the repository root (see [setup instructions](../../README.md#fresh-clone-setup)). The dependency-free starter target can be checked without running TODOs using `cargo test --offline --test chapter24 --no-run`. No complete reference solution is shipped. Extension projects are manual practice and are outside the core compilation checks.
