@@ -1,0 +1,9 @@
+[package]
+name="chapter16_random_lab"
+version="0.0.0"
+edition="2024"
+
+[workspace]
+
+[dependencies]
+rand="=0.10.3"

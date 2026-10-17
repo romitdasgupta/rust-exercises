@@ -1,0 +1,6 @@
+[package]
+name = "chapter22-event-consumer"
+version = "0.0.0"
+edition = "2024"
+[dependencies]
+renamed_events = { package = "chapter22-event-library", path = "../library" }

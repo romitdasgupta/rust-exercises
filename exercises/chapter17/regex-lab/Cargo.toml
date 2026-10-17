@@ -1,0 +1,9 @@
+[package]
+name="chapter17_regex_lab"
+version="0.0.0"
+edition="2024"
+
+[workspace]
+
+[dependencies]
+regex="=1.13.1"

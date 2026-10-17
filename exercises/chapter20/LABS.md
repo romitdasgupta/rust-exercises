@@ -1,0 +1,23 @@
+# Runtime-specific async projects
+
+The standard-library lessons practice futures and borrowing. They do not exercise Tokio APIs. Complete these isolated projects to cover the chapter's runtime-specific material. Create a new temporary Cargo package, add current `tokio` with the required rt-multi-thread, macros, sync, time, io-util, net features and `tokio-util` for CancellationToken, and follow their official documentation. Keep dependencies out of the root exercise package. Use only in-memory fixtures or loopback sockets; no public crawling.
+
+## Spawn bounds, outgoing links, and bounded crawling
+
+Create six local HTML fixtures with absolute or relative links, duplicates, a cycle, a missing page, and a disconnected page. Extract outgoing links with a real HTML parser in the isolated package; resolve against a loopback base URL. First serve them from one loopback HTTP fixture server, then implement an async fetch trait so tests can use an in-memory transport. Crawl with Tokio JoinSet, a pending queue, and a visited set; admit at most three in-flight fetches. Own an Arc of configuration inside each spawned task. Collect each successful result and each JoinError/application error explicitly. Acceptance: duplicate links fetched once, traversal result sorted deterministically, active-request counter never exceeds three, missing-page policy documented, and every task joined. Add a compile-only experiment capturing Rc across await (Send error), and a borrowed local String in spawn (static error), then repair with ownership/Arc or a nonspawned borrowed future. Explain why async move alone does not extend a borrowed referent's lifetime.
+
+## Waiting versus blocking
+
+Use a current-thread Tokio runtime, channels as start/completion signals, and a heartbeat task. Compare a CPU-bound checksum in an async body, a cooperatively chunked checksum yielding between chunks, and spawn_blocking. Do not use sleep as a correctness assertion; use signal order and record elapsed time only as an observation. Acceptance: identical checksum, worker task errors inspected, and an explanation of which work occupies the executor thread. Repeat a file-reading operation with Tokio fs rather than blocking std::fs, discussing its implementation/runtime tradeoff.
+
+## select!, state loss, and cancel safety
+
+Use tokio::io::duplex and a controllable sender. Race reading a two-byte header with a shutdown oneshot. In one version keep progress in a temporary read_exact future which is discarded whenever another select! branch wins; in another keep a persistent byte buffer/progress counter outside select!. Drive the interleaving with acknowledgement channels: first byte sent/consumed, competing branch released, second byte sent. Test that the chosen safe design does not lose the consumed first byte. Consult the current Tokio cancellation-safety docs for each operation; distinguish dropping read_exact from dropping a persistent future or read. Also test select! biased order and default fairness without asserting a random winning sequence. Acceptance: no timeout is used to induce an interleaving, persistent protocol state is explicit, and both shutdown and complete-message paths have tests. Add a drop counter to both branches and inspect which values survive branch cancellation.
+
+## Shutdown signals, aborts, and CancellationToken
+
+Run three workers in JoinSet. Each waits for either a bounded work channel item or a child cancellation token. The owner stops accepting work, signals cooperative cancellation, drains/joins workers, and reports completion. Compare this with JoinHandle::abort: await the handle and inspect JoinError::is_cancelled. Keep an RAII drop counter inside each worker and show which synchronous cleanup runs; discuss why asynchronous cleanup needs an explicit shutdown protocol. Test cancellation before startup, during a blocked receive, and after normal completion. Use tokio time::timeout only to bound test failure, and acknowledgement channels to arrange every scenario. Explain that aborting a running spawn_blocking job does not forcibly stop its closure. Acceptance: no detached tasks, all channels closed, all handles accounted for, no lost work beyond the documented shutdown policy.
+
+For each project submit predictions, runnable source, test output, and a brief explanation of ownership, wakeups, errors, and cancellation.
+
+References: [Tokio tutorial](https://tokio.rs/tokio/tutorial), [select! and cancellation safety](https://docs.rs/tokio/latest/tokio/macro.select.html), [spawn_blocking](https://docs.rs/tokio/latest/tokio/task/fn.spawn_blocking.html), and [CancellationToken](https://docs.rs/tokio-util/latest/tokio_util/sync/struct.CancellationToken.html).

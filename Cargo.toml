@@ -1,0 +1,102 @@
+[package]
+name = "types"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[[test]]
+name = "chapter03"
+path = "exercises/chapter03/mod.rs"
+
+[[test]]
+name = "chapter04"
+path = "exercises/chapter04/mod.rs"
+
+[[test]]
+name = "chapter05"
+path = "exercises/chapter05/mod.rs"
+
+[[test]]
+name = "chapter06"
+path = "exercises/chapter06/mod.rs"
+
+[[test]]
+name = "chapter07"
+path = "exercises/chapter07/mod.rs"
+
+[[test]]
+name = "chapter08"
+path = "exercises/chapter08/mod.rs"
+
+[[test]]
+name = "chapter09"
+path = "exercises/chapter09/mod.rs"
+
+[[test]]
+name = "chapter10"
+path = "exercises/chapter10/mod.rs"
+
+[features]
+playground = []
+
+[[bin]]
+name = "types"
+path = "src/main.rs"
+required-features = ["playground"]
+
+[[test]]
+name = "chapter11"
+path = "exercises/chapter11/mod.rs"
+
+[[test]]
+name = "chapter12"
+path = "exercises/chapter12/mod.rs"
+
+[[test]]
+name = "chapter13"
+path = "exercises/chapter13/mod.rs"
+
+[[test]]
+name = "chapter14"
+path = "exercises/chapter14/mod.rs"
+
+[[test]]
+name = "chapter15"
+path = "exercises/chapter15/mod.rs"
+
+[[test]]
+name = "chapter16"
+path = "exercises/chapter16/mod.rs"
+
+[[test]]
+name = "chapter17"
+path = "exercises/chapter17/mod.rs"
+
+[[test]]
+name = "chapter18"
+path = "exercises/chapter18/mod.rs"
+
+[[test]]
+name = "chapter19"
+path = "exercises/chapter19/mod.rs"
+
+[[test]]
+name = "chapter20"
+path = "exercises/chapter20/mod.rs"
+
+[[test]]
+name = "chapter21"
+path = "exercises/chapter21/mod.rs"
+
+[[test]]
+name = "chapter22"
+path = "exercises/chapter22/mod.rs"
+
+[[test]]
+name = "chapter23"
+path = "exercises/chapter23/mod.rs"
+
+[[test]]
+name = "chapter24"
+path = "exercises/chapter24/mod.rs"
