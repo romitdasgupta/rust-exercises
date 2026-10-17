@@ -10,11 +10,11 @@ The exercises are original practice problems, not a reproduction of the book. Re
 
 Install Git and [Rust through rustup](https://www.rust-lang.org/tools/install). The repository pins Rust **1.99.0** and uses edition 2024. Rustup installs the pinned toolchain when you first run Cargo in this directory. Install the formatting component explicitly if your rustup profile does not include it.
 
-Replace `<owner>` and `<repository>` with the GitHub repository's actual owner and name:
+Clone the repository:
 
 ```sh
-git clone https://github.com/<owner>/<repository>.git
-cd <repository>
+git clone https://github.com/romitdasgupta/rust-exercises.git
+cd rust-exercises
 rustup toolchain install 1.99.0 --profile minimal --component rustfmt
 cargo test --locked --offline --all-targets --no-run
 cargo test --locked --offline --release --all-targets --no-run
