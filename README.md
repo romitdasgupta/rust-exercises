@@ -2,9 +2,9 @@
 
 A chapter-by-chapter practice companion to [*Programming Rust*, 3rd edition](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/), covering Chapter 3 and every remaining technical chapter (4–24).
 
-Chapters 4–24 add **167 guided lessons and 396 core implementation tasks**, plus **7 implementation tasks in the isolated random and regex packages**. Every chapter includes a capstone and a map from the book sections to its exercises or labs.
+Chapters 3–24 contain **180 guided lessons, 21 spaced-review lessons, 22 code-review lessons, about 550 checked predictions, 217 compiler drills, and over 1,000 tests**. Every chapter includes a capstone and a map from the book sections to its exercises or labs. Two further tracks take you from the book to everyday professional Rust: a [production-crates track](ecosystem/README.md), and a project you build across the chapters (see [Beyond the book](#beyond-the-book)).
 
-The exercises are original practice problems, not a reproduction of the book. Read the corresponding chapter alongside them. Each chapter has its own guide, lesson files, progressive hints, tests, compiler experiments, coverage map, and capstone.
+The exercises are original practice problems, not a reproduction of the book. Read the corresponding chapter alongside them. Each chapter has its own guide, lessons, compiler drills, progressive hints with model explanations, a notes workbook, a coverage map, and a capstone.
 
 ## Fresh clone setup
 
@@ -31,7 +31,7 @@ Reading about Rust and recognizing it later is not the same as writing it under 
 For each lesson:
 
 1. **Read** the book section.
-2. **Predict.** Each lesson ends with a `p_predictions` test. Replace each `guess()` with what you think the code produces, *before running anything*. Wrong guesses are the most valuable part: write down why in the chapter's `NOTES.md`.
+2. **Predict.** Each lesson ends with a `p_predictions` test. Replace each `guess()` with what you think the code produces, *before running anything*. Wrong guesses are the most valuable part: write down why in the chapter's `NOTES.md`. Once every prediction in a file is answered, the compiler warns that `guess` is an unused import; delete it from the `use` line.
 3. **Implement** the `todo!()` bodies from their contracts and run only that lesson: `cargo test --test chapter04 l01_`.
 4. **Check your technique.** Some tests count heap allocations or compare pointers, so a solution that clones everything fails even when its output is right. Run `cargo clippy --test chapter04` and fix its warnings in your code; clippy encodes the idioms that experienced Rust programmers use.
 5. **Drill the compiler.** `cargo drill ch04` gives you short programs. Predict whether each compiles (and with which error code) or panics, see the verdict, then fix the program. Reading compiler errors fluently is most of day-to-day Rust.
@@ -138,6 +138,12 @@ The supported toolchain is Rust 1.99.0, pinned in `rust-toolchain.toml`; the pac
 
 `src/main.rs` is your personal experiment file. Run it with `cargo run --features playground`. The feature is off during the chapter tests, so an intentional compiler error in the playground does not block your exercise checks. Scratch examples are compiled by `--all-targets`, so repair intentional scratch errors before running that broad check.
 
+## Beyond the book
+
+| Track | When | What it practices |
+| --- | --- | --- |
+| [Production crates](ecosystem/README.md) | E01 after Chapter 7; the rest as their chapters are done | serde, thiserror and anyhow, clap, tracing, proptest, tokio, and everyday Cargo tooling, with "why this crate, and what are the alternatives" judgment for each. A standalone package with pinned dependencies (one download, then offline). |
+
 ## Labs that need another tool or crate
 
 The chapter guides distinguish the runnable core from explicit labs for Cargo package structure, optional crates, async runtimes, system libraries, and build/linker behavior. Follow those labs in their own temporary Cargo projects. They have concrete implementation goals and expected observations; they are part of the coverage, not automated by the core tests.
@@ -162,7 +168,7 @@ A green test result checks the required behavior. It does not prove that you use
 
 ## Validation scope
 
-A clean starter checkout should compile all 22 chapter targets (3–24) and their scratch examples offline in debug and release profiles using the fresh-clone commands above. Formatting is checked separately. The isolated random, regex, and external macro-consumer packages have their own manifests and are not included in the root Cargo checks. The first two need a dependency download before offline builds work. The [starter CI workflow](.github/workflows/ci.yml) checks formatting and compiles the core (including the playground) and all three extension packages in both profiles on Linux, macOS, and Windows; it deliberately does not execute unfinished exercises.
+A clean starter checkout should compile all 22 chapter targets (3–24) and their scratch examples offline in debug and release profiles using the fresh-clone commands above. Formatting is checked separately. The isolated random, regex, external macro-consumer, and production-crates packages have their own manifests and are not included in the root Cargo checks. The random, regex, and production-crates packages need a dependency download before offline builds work. The [starter CI workflow](.github/workflows/ci.yml) checks formatting and clippy, runs the coach's own tests, and compiles the core (including the playground) and every extension package in both profiles on Linux, macOS, and Windows; it deliberately does not execute unfinished exercises.
 
 Running unfinished tests is expected to fail. Compilation checks establish that a learner can start; they do not establish that unfinished implementations are correct. No complete reference solution is shipped. Tests also do not prove that an unsafe abstraction is sound for every possible caller: its written safety argument is part of the exercise.
 
