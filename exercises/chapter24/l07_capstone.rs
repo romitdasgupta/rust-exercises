@@ -1,11 +1,8 @@
 //! LESSON 07 — Capstone: checked foreign transaction
 //! Run: cargo test --test chapter24 l07_
 //!
-//! PREDICT before running:
-//! 1. Must foreign error text be copied before another library call?
-//! 2. Can a failed out-parameter be inspected for debugging?
-//!
-//! IMPLEMENT the tasks; keep the tests.
+//! PREDICT before running: Must foreign error text be copied before another library call? Can a failed out-parameter be inspected for debugging?
+//! IMPLEMENT the tasks below. Preserve the tests and add an edge case.
 //! EXPLAIN: Audit arguments, status, initialized output, owned error copying, and no unwinding across the ABI. Explain which real libgit2 obligations remain in LABS.md.
 //! COMPILER LAB (examples/ch24_scratch.rs): Add a second call after an error and show that the already-copied Rust error remains valid. Design an RAII session that initializes a library before handles and shuts it down after all handles.
 
@@ -56,8 +53,9 @@ fn batch(items: &[(&str, c_int)]) -> Result<Vec<c_int>, (usize, String)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::alloc::count;
     #[test]
-    fn boundary_checks_every_representation() {
+    fn a_boundary_checks_every_representation() {
         assert_eq!(score("é", 3), Ok(6));
         assert_eq!(score("", 9), Ok(0));
         assert_eq!(score("bad\0name", 2), Err("interior NUL".into()));
@@ -67,12 +65,50 @@ mod tests {
         assert_eq!(score("abc", c_int::MAX), Err("invalid weight".into()));
     }
     #[test]
-    fn batch_reports_index_and_stops() {
+    fn a_zero_weight_and_the_overflow_edge() {
+        assert_eq!(score("abc", 0), Ok(0), "0 is a score, not a failure");
+        let max_ok = c_int::MAX / 2;
+        assert_eq!(score("ab", max_ok), Ok(max_ok * 2));
+        assert_eq!(score("ab", max_ok + 1), Err("invalid weight".into()));
+        assert_eq!(
+            score("\0", -1),
+            Err("interior NUL".into()),
+            "NUL is checked before the call"
+        );
+    }
+    #[test]
+    fn a_score_allocates_only_what_it_returns_or_passes() {
+        let (ok, allocations) = count(|| score("abc", 2));
+        assert_eq!(ok, Ok(6));
+        assert!(
+            allocations <= 1,
+            "only the CString argument; got {allocations}"
+        );
+        let (err, allocations) = count(|| score("abc", -2));
+        assert_eq!(err, Err("invalid weight".to_string()));
+        assert!(
+            allocations <= 2,
+            "the CString and the copied message; got {allocations}"
+        );
+    }
+    #[test]
+    fn b_batch_reports_index_and_stops() {
         assert_eq!(batch(&[("a", 2), ("bb", 3)]), Ok(vec![2, 6]));
         assert_eq!(
             batch(&[("a", 2), ("b", -1), ("c", 4)]),
             Err((1, "invalid weight".into()))
         );
         assert_eq!(batch(&[]), Ok(vec![]));
+    }
+    #[test]
+    fn b_batch_reports_the_first_of_several_errors() {
+        assert_eq!(
+            batch(&[("x\0", 1), ("y", -1)]),
+            Err((0, "interior NUL".into()))
+        );
+        assert_eq!(
+            batch(&[("a", 1), ("b", 1), ("c", -5)]),
+            Err((2, "invalid weight".into()))
+        );
     }
 }
