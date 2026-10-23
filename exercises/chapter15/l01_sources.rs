@@ -1,8 +1,9 @@
 //! LESSON 01 — Borrowed, mutable, owned, and draining sources
 //! Run: cargo test --test chapter15 l01_
 //!
-//! PREDICT before executing: What are the Item types of slice.iter(), iter_mut(), and
-//! Vec::into_iter()? When are elements removed by drain?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: What are the Item types of slice.iter(),
+//! iter_mut(), and Vec::into_iter()? When are elements removed by drain?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Why can reading and editing use different iterator types over the
@@ -30,12 +31,21 @@ fn drain_range(mut values: Vec<String>, start: usize, end: usize) -> (Vec<String
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
     #[test]
     fn a_borrowed_source_widens_before_sum() {
         let v = vec![i32::MAX, i32::MAX, -1];
         assert_eq!(borrowed_sum(&v), 4_294_967_293);
         assert_eq!(v.len(), 3);
         assert_eq!(borrowed_sum(&[]), 0);
+        assert_eq!(borrowed_sum(&[i32::MIN, i32::MIN]), -4_294_967_296);
+    }
+    #[test]
+    fn a_borrowed_sum_does_not_allocate() {
+        let v: Vec<i32> = (0..1000).collect();
+        let (total, allocations) = count(|| borrowed_sum(&v));
+        assert_eq!(total, 499_500);
+        assert_eq!(allocations, 0, "summing needs no intermediate collection");
     }
     #[test]
     fn b_mutable_source_edits_elements() {
@@ -50,5 +60,54 @@ mod tests {
             (vec!["b".into(), "c".into()], vec!["a".into(), "d".into()])
         );
         assert_eq!(drain_range(vec![], 0, 0), (vec![], vec![]));
+    }
+    #[test]
+    fn c_drained_strings_move_without_cloning() {
+        let v: Vec<String> = vec!["keep".into(), "move".into(), "keep".into()];
+        let moved = v[1].as_ptr();
+        let (removed, remaining) = drain_range(v, 1, 2);
+        assert_eq!(
+            removed[0].as_ptr(),
+            moved,
+            "drain hands out the owned String"
+        );
+        assert_eq!(remaining, ["keep", "keep"]);
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    /// A wrong prediction is useful: read the failure, then explain it in NOTES.md.
+    #[test]
+    fn p_predictions() {
+        // P1. A Drain dropped after one item: what is left in the vector?
+        let mut v = vec![1, 2, 3, 4, 5];
+        {
+            let mut drain = v.drain(1..4);
+            drain.next();
+        }
+        let p1: Vec<i32> = guess();
+        assert_eq!(p1, v, "P1: drain removes its whole range");
+
+        // P2. Does each item keep its original heap buffer?
+        // (via into_iter(), via to_vec())
+        let words = vec![String::from("one")];
+        let original = words[0].as_ptr();
+        let cloned: Vec<String> = words.to_vec();
+        let moved: Vec<String> = words.into_iter().collect();
+        let p2: (bool, bool) = guess();
+        assert_eq!(
+            p2,
+            (
+                moved[0].as_ptr() == original,
+                cloned[0].as_ptr() == original
+            ),
+            "P2: into_iter moves items; to_vec clones them"
+        );
+
+        // P3. Heap allocations made by a map-then-sum pipeline over 1000 values.
+        let v: Vec<i32> = (0..1000).collect();
+        let (total, allocations) = count(|| v.iter().map(|x| x * 2).sum::<i32>());
+        let p3: usize = guess();
+        assert_eq!(p3, allocations, "P3: adapters do not allocate");
+        assert_eq!(total, 999_000);
     }
 }

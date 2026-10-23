@@ -1,8 +1,9 @@
 //! LESSON 08 — Folds, short circuits, and side effects
 //! Run: cargo test --test chapter15 l08_
 //!
-//! PREDICT before executing: Is fold order observable for subtraction or string
-//! construction? Does try_fold consume the first item that fails?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: Is fold order observable for subtraction or
+//! string construction? Does try_fold consume the first item that fails?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Why should a fallible consumer stop immediately? How do rfold and
@@ -32,10 +33,12 @@ fn audit(values: &[i32]) -> (Vec<i32>, Result<(), &'static str>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
     #[test]
     fn a_fold_carries_the_previous_result() {
         assert_eq!(nesting(&[1, -2]), "((x+1)+-2)");
         assert_eq!(nesting(&[]), "x");
+        assert_eq!(nesting(&[7]), "(x+7)");
     }
     #[test]
     fn b_try_fold_checks_without_wrapping() {
@@ -47,6 +50,39 @@ mod tests {
     fn c_try_for_each_stops_immediately() {
         assert_eq!(audit(&[1, -2, 3]), (vec![1, -2], Err("negative")));
         assert_eq!(audit(&[0, 2]), (vec![0, 2], Ok(())));
+        assert_eq!(audit(&[-1, -2]), (vec![-1], Err("negative")));
+        assert_eq!(audit(&[]), (vec![], Ok(())));
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    /// A wrong prediction is useful: read the failure, then explain it in NOTES.md.
+    #[test]
+    fn p_predictions() {
+        // P1. Building digits with fold and with rfold: (fold, rfold).
+        let digits = [1, 2, 3];
+        let left = digits.iter().fold(0, |acc, d| acc * 10 + d);
+        let right = digits.iter().rfold(0, |acc, d| acc * 10 + d);
+        let p1: (i32, i32) = guess();
+        assert_eq!(p1, (left, right), "P1: fold direction");
+
+        // P2. Checked u8 sum of [100, 100, 100, 1]: (result, closure calls).
+        let mut calls = 0;
+        let sum = [100u8, 100, 100, 1].iter().try_fold(0u8, |acc, &x| {
+            calls += 1;
+            acc.checked_add(x)
+        });
+        let p2: (Option<u8>, i32) = guess();
+        assert_eq!(p2, (sum, calls), "P2: try_fold stops at the first None");
+
+        // P3. After that failure, how many items are left in the iterator?
+        let mut it = [1u8, 255, 3, 4].iter();
+        let sum = it.try_fold(0u8, |acc, &x| acc.checked_add(x));
+        let p3: (Option<u8>, usize) = guess();
+        assert_eq!(
+            p3,
+            (sum, it.len()),
+            "P3: the failing item is consumed, the rest remain"
+        );
     }
 }
 
