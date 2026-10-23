@@ -31,12 +31,20 @@ impl Inventory {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::alloc::count;
     #[test]
     fn a_constructor_establishes_invariants() {
         let i = Inventory::new(" 港 ", 3).unwrap();
         assert_eq!(i.name, "港");
         assert_eq!(i.reads.get(), 0);
+        assert_eq!(i.stock, 3);
         assert!(Inventory::new(" \n", 0).is_none());
+        assert!(Inventory::new("", 1).is_none());
+        assert!(
+            Inventory::new("\u{3000}", 1).is_none(),
+            "U+3000 is whitespace"
+        );
+        assert_eq!(Inventory::new("\tbin 4\n", 0).unwrap().name, "bin 4");
     }
     #[test]
     fn b_failed_mutation_leaves_stock_unchanged() {
@@ -45,6 +53,8 @@ mod tests {
         assert!(!i.restock(1));
         assert_eq!(i.stock, 65535);
         assert_eq!(i.reads.get(), 0);
+        assert!(i.restock(0));
+        assert_eq!(i.stock, 65535);
     }
     #[test]
     fn c_observation_updates_only_the_statistic() {
@@ -56,5 +66,17 @@ mod tests {
         i.reads.set(u32::MAX);
         i.inspect();
         assert_eq!(i.reads.get(), u32::MAX);
+    }
+    #[test]
+    fn a_c_owns_the_name_once_and_never_clones_it() {
+        let (i, allocations) = count(|| Inventory::new("  crates  ", 1));
+        let i = i.unwrap();
+        assert!(
+            allocations <= 1,
+            "owning a trimmed name needs one allocation, not {allocations}"
+        );
+        let (view, allocations) = count(|| i.inspect().0.len());
+        assert_eq!(view, 6);
+        assert_eq!(allocations, 0, "inspect should borrow the name");
     }
 }
