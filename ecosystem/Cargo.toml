@@ -1,0 +1,53 @@
+[package]
+license = "MIT"
+name = "ecosystem"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+
+# A standalone package: not a member of the root workspace.
+[workspace]
+
+[dependencies]
+anyhow = "=1.0.104"
+clap = { version = "=4.6.7", features = ["derive"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+thiserror = "=2.0.21"
+tokio = { version = "=1.54.1", features = ["macros", "rt", "sync", "time"] }
+tracing = "=0.1.44"
+tracing-subscriber = { version = "=0.3.23", default-features = false, features = ["fmt", "std"] }
+
+[dev-dependencies]
+proptest = { version = "=1.12.0", default-features = false, features = ["std"] }
+# Paused virtual time for #[tokio::test(start_paused = true)].
+tokio = { version = "=1.54.1", features = ["test-util"] }
+
+[[bin]]
+name = "jobq"
+path = "src/bin/jobq.rs"
+
+[[test]]
+name = "e07_capstone"
+path = "tests/e07_capstone.rs"
+
+[[test]]
+name = "e07_tracing"
+path = "tests/e07_tracing.rs"
+
+# Lesson E08: lint configuration lives in the manifest, so `cargo clippy` and CI agree.
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+dbg_macro = "warn"
+
+# Lesson E08: release builds with line tables, so profilers can name frames.
+[profile.release]
+debug = "line-tables-only"
+
+# `cargo build --profile profiling`: release speed plus full debug info for flamegraphs.
+[profile.profiling]
+inherits = "release"
+debug = true
