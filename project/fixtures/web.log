@@ -1,0 +1,8 @@
+# loglens fixture: a web front end
+2026-10-23T17:02:58Z INFO http method=GET path=/ status=200 latency_ms=12
+2026-10-23T17:03:01Z INFO http method=POST path=/login status=200 latency_ms=58 user=ada
+2026-10-23T17:03:03Z WARN http method=POST path=/login status=401 latency_ms=330 user=bob
+2026-10-23T17:03:04Z INFO http method=GET path="/search?q=disk full" status=200 latency_ms=140
+2026-10-23T17:03:07Z ERROR http method=GET path=/report status=500 latency_ms=5020 msg="upstream timeout"
+2026-10-23T17:03:10Z TRACE http method=GET path=/health status=200
+2026-10-23T17:03:13Z INFO http method=POST path=/logout status=204 latency_ms=9 user=ada
