@@ -6,7 +6,7 @@
 //!
 //! Run `cargo drill ch03`. Then FIX it with the smallest change that keeps
 //! every line marked KEEP and makes the program run cleanly.
-//! Ask: can every field of a tuple have the same type at run time?
+//! Ask: if each field can have its own type, what type would reading[field] be?
 
 fn main() {
     let reading = (21, "celsius");
