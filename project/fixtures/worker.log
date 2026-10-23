@@ -1,0 +1,6 @@
+# loglens fixture: a background worker; line 4 is cut off
+2026-10-23T17:03:00Z INFO worker job=invoice-42 state=queued
+2026-10-23T17:03:06Z INFO worker job=invoice-42 state=running user=cy
+2026-10-23T17:03:19Z INFO worker job=invoice-42 state=done latency_ms=13000 msg="invoice
+2026-10-23T17:03:19Z INFO worker job=invoice-42 state=done latency_ms=13000 msg="invoice rendered"
+2026-10-23T17:04:00Z WARN worker job=cleanup msg="disk 91% full" disk_pct=91

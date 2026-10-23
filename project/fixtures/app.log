@@ -1,0 +1,11 @@
+# loglens fixture: an authentication service and its database
+2026-10-23T17:03:00Z INFO auth user=ada latency_ms=42 msg="login ok"
+2026-10-23T17:03:02Z WARN auth user=bob latency_ms=310 msg="slow password check"
+2026-10-23T17:03:05Z ERROR auth user=bob latency_ms=97 msg="login failed: \"bad password\""
+2026-10-23T17:03:09Z INFO db query="select 1" latency_ms=4
+
+2026-10-23T17:03:11Z DEBUG cache hit=true key=session:ada
+2026-10-23T17:03:12Z INFO auth user=ada latency_ms=39 msg="logout"
+not a log line
+2026-10-23T17:03:20Z INFO billing user=cy amount=1200 msg="invoice sent"
+2026-10-23T17:03:21Z ERROR db latency_ms=5012 msg="connection reset"
