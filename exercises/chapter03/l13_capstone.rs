@@ -44,6 +44,7 @@ fn summarize(label: &str, readings: &[u8]) -> Summary {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::alloc::count;
 
     #[test]
     fn a_checked_total_accepts_the_limit_and_rejects_overflow() {
@@ -59,6 +60,8 @@ mod tests {
         assert_eq!(saturated_total(&[10, 20]), 30);
         assert_eq!(saturated_total(&[250, 10]), 255);
         assert_eq!(saturated_total(&[255, 255, 1]), 255);
+        // A wider sum that wraps first and clamps afterward would return 254.
+        assert_eq!(saturated_total(&vec![255; 258]), 255);
     }
 
     #[test]
@@ -106,5 +109,14 @@ mod tests {
         assert_eq!(sorted, readings);
         assert_eq!(totals, (None, 255));
         assert_eq!(metrics, (3, 3));
+    }
+
+    #[test]
+    fn a_b_totals_scan_the_borrowed_slice() {
+        let readings = vec![200_u8; 100];
+        let (totals, allocations) =
+            count(|| (checked_total(&readings), saturated_total(&readings)));
+        assert_eq!(totals, (Some(20_000), 255));
+        assert_eq!(allocations, 0, "summing needs no copy of the readings");
     }
 }

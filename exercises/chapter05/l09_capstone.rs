@@ -20,6 +20,7 @@ fn label_at(labels: &[String], index: usize) -> Option<&str> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::alloc::count;
     #[test]
     fn a_selection_uses_scalar_count_and_first_tie() {
         let a = vec!["🦀".into(), "ab".into(), "cd".into()];
@@ -34,5 +35,16 @@ mod tests {
         assert_eq!(label_at(&a, 1), None);
         assert_eq!(label_at(&[], 0), None);
         assert_eq!(label_at(&a, 0).unwrap().as_ptr(), a[0][1..].as_ptr());
+    }
+
+    #[test]
+    fn a_b_queries_never_copy_labels() {
+        let labels: Vec<String> = (0..50).map(|i| format!(" label {i} ")).collect();
+        let (index, allocations) = count(|| longest_index(&labels));
+        assert_eq!(index, Some(10));
+        assert_eq!(allocations, 0, "compare lengths through borrows");
+        let (label, allocations) = count(|| label_at(&labels, 7));
+        assert_eq!(label, Some("label 7"));
+        assert_eq!(allocations, 0, "trim returns a borrowed subslice");
     }
 }

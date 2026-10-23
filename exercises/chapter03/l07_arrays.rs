@@ -1,9 +1,11 @@
 //! LESSON 07 — Fixed-size, inline sequences
 //! Run: cargo test --test chapter03 l07_
 //!
-//! PREDICT: Are `[u8; 8]` and `[u8; 9]` the same type? What is `[0_u8; 8]`?
-//! How many bytes do `[[i16; 3]; 2]` occupy? Does an array inherently require
-//! a separate heap allocation? Is a local array guaranteed to live on the stack?
+//! PREDICT: first answer `p_predictions` at the bottom (replace each `guess()`
+//! with your answer). Then consider: Are `[u8; 8]` and `[u8; 9]` the same type?
+//! What is `[0_u8; 8]`? How many bytes do `[[i16; 3]; 2]` occupy? Does an array
+//! inherently require a separate heap allocation? Is a local array guaranteed
+//! to live on the stack?
 //!
 //! EXPLAIN: Why must an array length be known at compile time? How can a nested
 //! array live inside another value? Compare indexing with `get` on invalid input.
@@ -32,6 +34,7 @@ fn lookup(buffer: &[u8; 8], index: usize) -> Option<&u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
 
     #[test]
     fn a_all_bytes_are_initialized() {
@@ -55,5 +58,35 @@ mod tests {
         assert_eq!(lookup(&buffer, 8), None);
         assert_eq!(lookup(&buffer, usize::MAX), None);
         assert!(std::ptr::eq(lookup(&buffer, 3).unwrap(), &buffer[3]));
+    }
+
+    #[test]
+    fn a_b_arrays_do_not_touch_the_heap() {
+        let (_, allocations) = count(framed_buffer);
+        assert_eq!(allocations, 0, "an array needs no heap allocation");
+        let (_, allocations) = count(|| repeated_rows([1, 2, 3]));
+        assert_eq!(allocations, 0, "nested arrays are stored inline");
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Sizes in bytes of a nested array and an empty array.
+        let p1: (usize, usize) = guess();
+        assert_eq!(
+            p1,
+            (size_of::<[[u32; 4]; 3]>(), size_of::<[u8; 0]>()),
+            "P1: array sizes"
+        );
+
+        // P2. Which length is the outer one?
+        let grid = [[0_u8; 3]; 2];
+        let p2: (usize, usize) = guess();
+        assert_eq!(p2, (grid.len(), grid[0].len()), "P2: nested lengths");
+
+        // P3. Checked access at the last index and one past it.
+        let a = [10, 20, 30];
+        let p3: (Option<&i32>, Option<&i32>) = guess();
+        assert_eq!(p3, (a.get(2), a.get(3)), "P3: get");
     }
 }

@@ -184,6 +184,16 @@ Your workbook. Write answers in your own words, *before* checking the hints. Whe
 
 - 
 
+## c01 · A teammate's pull request
+
+**My review, written before running the tests:**
+
+- 
+
+**Edge case I added:**
+
+- 
+
 ## Drills
 
 Drills whose verdict surprised me, and the rule I learned:

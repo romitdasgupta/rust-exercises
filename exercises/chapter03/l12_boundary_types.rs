@@ -1,10 +1,11 @@
 //! LESSON 12 — Pick the representation at a system boundary
 //! Run: cargo test --test chapter03 l12_
 //!
-//! PREDICT: Give the types of b"OK", b'O', and c"status". Which of the
-//! byte and C-string literals contains an implicit terminal zero byte?
-//! Can an OS filename contain bytes that aren't UTF-8? Can a C string
-//! contain an interior zero byte? What does a type alias change?
+//! PREDICT: first answer `p_predictions` at the bottom (replace each `guess()`
+//! with your answer). Then consider: Give the types of b"OK", b'O', and
+//! c"status". Which of the byte and C-string literals contains an implicit
+//! terminal zero byte? Can an OS filename contain bytes that aren't UTF-8? Can
+//! a C string contain an interior zero byte? What does a type alias change?
 //!
 //! EXPLAIN: Choose types for user text, arbitrary file contents, filesystem
 //! paths, environment-variable names, and C API arguments. Distinguish owned
@@ -46,6 +47,7 @@ fn c_command() -> &'static CStr {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
 
     #[test]
     fn a_alias_is_still_an_ordinary_byte_vector() {
@@ -84,5 +86,47 @@ mod tests {
     fn d_c_string_has_one_terminal_zero() {
         assert_eq!(c_command().to_bytes(), b"status");
         assert_eq!(c_command().to_bytes_with_nul(), b"status\0");
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Bytes in a byte string, and bytes in a C string including its end.
+        let p1: (usize, usize) = guess();
+        assert_eq!(
+            p1,
+            (b"OK".len(), c"OK".to_bytes_with_nul().len()),
+            "P1: byte and C-string literals"
+        );
+
+        // P2. Is the alias a different type from Vec<u8>?
+        use std::any::TypeId;
+        let p2: bool = guess(); // true if they are the same type
+        assert_eq!(
+            p2,
+            TypeId::of::<PacketBytes>() == TypeId::of::<Vec<u8>>(),
+            "P2: an alias is only a name"
+        );
+
+        // P3. Extension and file stem of a file with two dots.
+        let path = Path::new("archive.tar.gz");
+        let p3: (Option<&str>, Option<&str>) = guess();
+        assert_eq!(
+            p3,
+            (
+                path.extension().and_then(OsStr::to_str),
+                path.file_stem().and_then(OsStr::to_str)
+            ),
+            "P3: Path splits at the last dot"
+        );
+
+        // P4. Lossy decoding replaces the invalid byte with U+FFFD.
+        let text = String::from_utf8_lossy(&[b'o', 0xff, b'k']);
+        let p4: (usize, usize) = guess();
+        assert_eq!(
+            p4,
+            (text.chars().count(), text.len()),
+            "P4: scalars and bytes after lossy decoding"
+        );
     }
 }

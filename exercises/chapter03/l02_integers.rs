@@ -1,9 +1,11 @@
 //! LESSON 02 — Integer representations, literals, and casts
 //! Run: cargo test --test chapter03 l02_
 //!
-//! PREDICT: Give the ranges of `u8` and `i8`. What do `300_u16 as u8` and
-//! `255_u8 as i8` produce? How many bytes does a `u64` occupy? What determines
-//! the width of `usize`, and why should an array index use that type?
+//! PREDICT: first answer `p_predictions` at the bottom (replace each `guess()`
+//! with your answer). Then consider: Give the ranges of `u8` and `i8`. What do
+//! `300_u16 as u8` and `255_u8 as i8` produce? How many bytes does a `u64`
+//! occupy? What determines the width of `usize`, and why should an array index
+//! use that type?
 //!
 //! EXPLAIN: Distinguish a numeric value from its bit pattern. When can `as`
 //! discard information? Why is truncation appropriate for task B specifically?
@@ -37,6 +39,7 @@ fn set_bits(value: u16) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
 
     #[test]
     fn a_bases_change_notation_not_value() {
@@ -64,5 +67,36 @@ mod tests {
         assert_eq!(set_bits(0), 0);
         assert_eq!(set_bits(u16::MAX), 16);
         assert_eq!(set_bits(0xa00f), 6);
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Narrowing casts keep the low bits. What are these?
+        let wide = 300_u16;
+        let all_ones = 255_u8;
+        let p1: (u8, i8) = guess();
+        assert_eq!(
+            p1,
+            (wide as u8, all_ones as i8),
+            "P1: truncating and reinterpreting casts"
+        );
+
+        // P2. Casting a negative i8 to the same width, and to wider types.
+        let minus_one = -1_i8;
+        let p2: (u8, i32, u32) = guess();
+        assert_eq!(
+            p2,
+            (minus_one as u8, minus_one as i32, minus_one as u32),
+            "P2: widening a signed value sign-extends it"
+        );
+
+        // P3. Sizes in bytes, and the width of usize on a 64-bit target.
+        let p3: (usize, usize, u32) = guess();
+        assert_eq!(
+            p3,
+            (size_of::<u64>(), size_of::<i128>(), usize::BITS),
+            "P3: integer widths"
+        );
     }
 }
