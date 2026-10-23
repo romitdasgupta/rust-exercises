@@ -12,3 +12,10 @@ dependencies = [
 [[package]]
 name = "chapter22-event-library"
 version = "0.0.0"
+dependencies = [
+ "types",
+]
+
+[[package]]
+name = "types"
+version = "0.1.0"

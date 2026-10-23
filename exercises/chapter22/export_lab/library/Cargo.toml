@@ -4,3 +4,6 @@ name = "chapter22-event-library"
 version = "0.0.0"
 edition = "2024"
 rust-version = "1.99"
+[dev-dependencies]
+# l06's prediction test uses `practice::guess` from the exercise repository.
+practice = { package = "types", path = "../../../.." }

@@ -4,11 +4,20 @@
 
 Original exercises accompanying [Programming Rust, 3rd edition, chapter 24](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch24.html). Read the corresponding section, then practice without copying the book's examples.
 
-## Working route
+## Work through the chapter
 
-Predict on paper first. Implement one lesson's TODOs, run its filtered tests, do its scratch experiment, and explain the result in your own words. Add one edge case of your own. Open [HINTS.md](HINTS.md) only after an attempt. Passing tests is one part of mastery; the explanation and labs matter too.
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
 
-The starter compiles; unfinished TODOs intentionally fail when reached. Keep the supplied tests. Each lesson is independent, including the capstone, so later unfinished tasks do not block an earlier lesson.
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter24 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests count heap allocations or compare pointers, so a wrapper that copies buffers it could borrow or reserve fails. Then run `cargo clippy --test chapter24` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch24` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), add one edge-case test, then compare with *Check your explanation* in [HINTS.md](HINTS.md).
+
+After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
+
+The foreign functions here are Rust-defined `extern "C"` mocks, so no C compiler or system library is needed. Write a `// SAFETY:` comment for every unsafe block. Each lesson is independent, including the capstone, so later unfinished tasks do not block an earlier lesson.
 
 | Done | Lesson | Coding tasks |
 | --- | --- | --- |
@@ -19,17 +28,23 @@ The starter compiles; unfinished TODOs intentionally fail when reached. Keep the
 | [ ] | [l05 · Opaque handle ownership](l05_handles.rs) | 2 |
 | [ ] | [l06 · Owner-bound foreign borrows](l06_borrows.rs) | 2 |
 | [ ] | [l07 · Capstone: checked foreign transaction](l07_capstone.rs) | 2 |
+| [ ] | [R01 · Review: Chapters 18, 22, and 23 from memory](r01_review.rs) | 3 |
+| [ ] | [C01 · Code review: a teammate's FFI wrapper](c01_code_review.rs) | 3 |
+| [ ] | [Compiler drills](../../drills/ch24/) — `cargo drill ch24` | 10 |
 
 ```sh
 cargo test --test chapter24 l01_
 cargo test --test chapter24 -- --list
-# After completing all lessons:
 cargo test --test chapter24
 cargo test --release --test chapter24
+cargo clippy --test chapter24
+cargo drill ch24
 cargo run --example ch24_scratch
 ```
 
-Use [the scratch example](../../examples/ch24_scratch.rs) for experiments and restore it to a compiling state afterward. Core lessons use only the standard library. Dependency or platform labs have their own instructions and are outside the normal test target.
+The starters compile; tests fail intentionally at `todo!()` and `guess()` until you fill them in. Keep the supplied tests intact. Every runnable task uses the standard library and needs no network. Free-form compiler experiments belong in [the scratch example](../../examples/ch24_scratch.rs); restore it to compiling code afterward. Dependency or platform labs have their own instructions and are outside the normal test target.
+
+Use [progressive hints](HINTS.md) only after a first attempt.
 
 ## Coverage map
 
@@ -37,8 +52,8 @@ The section labels below follow the book's contents. A mapping to a lab means a 
 
 | Book sections | Practice |
 | --- | --- |
-| Finding Common Data Representations | l01 C ABI types/layout; l02 C strings; LABS.md actual C headers |
-| Declaring Foreign Functions and Variables | l03 ABI function pointers and status/out-parameters; LABS.md extern/static declarations |
+| Finding Common Data Representations | l01 C ABI types/layout; l02 C strings; r01 explicit wire format; drills d05–d08; LABS.md actual C headers |
+| Declaring Foreign Functions and Variables | l03 ABI function pointers and status/out-parameters; c01 status codes; drills d01–d04, d09; LABS.md extern/static declarations |
 | Using Functions from Libraries | l04 callback/userdata boundary; LABS.md real C linker project |
 | A Raw Interface to libgit2 | l05 typed opaque handle model; LABS.md actual libgit2 declarations/errors |
 | A Safe Interface to libgit2 | l05 RAII owner and l06 lifetime-bound borrow; LABS.md real repository wrapper |
