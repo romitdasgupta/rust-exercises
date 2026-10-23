@@ -1,7 +1,8 @@
 //! LESSON 02 — Moves across assignments and fields
 //! Run: cargo test --test chapter04 l02_
 //!
-//! PREDICT before running: After moving one String out of a tuple, can you use its other field? Can you use the whole tuple?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: After moving one String out of a tuple, can you use its other field? Can you use the whole tuple?
 //! IMPLEMENT the tasks below. Preserve the tests and add an edge case.
 //! EXPLAIN afterward: Explain partial moves, the remaining fields, and the difference between moving a tuple and destructuring it.
 //! COMPILER / TRANSFER LAB: Move a String into a function, then try printing the old binding. Repair by accepting the returned value. Destructure only one field of a tuple and test which expressions compile.
@@ -18,6 +19,7 @@ fn append_owned(mut values: Vec<String>, label: String) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
     #[test]
     fn a_fields_move_independently() {
         let a = "a".to_owned();
@@ -36,5 +38,47 @@ mod tests {
             ["first", "last"]
         );
         assert_eq!(append_owned(vec![], "".into()), [""]);
+    }
+
+    #[test]
+    fn a_b_moves_do_not_allocate() {
+        let pair = ("a".to_owned(), "b".to_owned());
+        let (_, allocations) = count(|| reverse_pair(pair));
+        assert_eq!(allocations, 0, "reverse_pair should move, not clone");
+        let mut values = Vec::with_capacity(2);
+        values.push("first".to_owned());
+        let label = "last".to_owned();
+        let (_, allocations) = count(|| append_owned(values, label));
+        assert_eq!(allocations, 0, "append_owned should move the label in");
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. How many machine words (usize) does a String's stack header take?
+        let p1: usize = guess();
+        assert_eq!(
+            p1 * size_of::<usize>(),
+            size_of::<String>(),
+            "P1: String header size"
+        );
+
+        // P2. Pushing a String into a vector: does the text get a new buffer?
+        let mut v = Vec::with_capacity(1);
+        let s = String::from("cargo");
+        let before = s.as_ptr();
+        v.push(s);
+        let p2: bool = guess(); // true if v[0] still uses the same buffer
+        assert_eq!(p2, v[0].as_ptr() == before, "P2: push moves the header");
+
+        // P3. How many heap allocations does moving a 3-element Vec<String> make?
+        let v = vec!["a".to_owned(), "b".to_owned(), "c".to_owned()];
+        let (moved, allocations) = count(|| {
+            let moved = v;
+            moved
+        });
+        let p3: usize = guess();
+        assert_eq!(p3, allocations, "P3: allocations made by a move");
+        assert_eq!(moved.len(), 3);
     }
 }

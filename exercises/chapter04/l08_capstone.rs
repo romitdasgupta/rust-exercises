@@ -21,6 +21,7 @@ fn finish(job: (String, Rc<String>)) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::alloc::count;
     #[test]
     fn a_dispatch_moves_labels_and_shares_config() {
         let label = String::from("one");
@@ -38,5 +39,16 @@ mod tests {
         assert_eq!(finish(jobs.remove(0)), "one@cfg");
         assert_eq!(Rc::strong_count(&jobs[0].1), 1);
         assert_eq!(finish((String::new(), Rc::new(String::new()))), "@");
+    }
+
+    #[test]
+    fn a_dispatch_never_clones_labels_or_config() {
+        let labels: Vec<String> = (0..200).map(|i| i.to_string()).collect();
+        let (jobs, allocations) = count(|| dispatch(labels, "zone".into()));
+        assert_eq!(jobs.len(), 200);
+        assert!(
+            allocations < 20,
+            "200 labels moved should not cost {allocations} allocations"
+        );
     }
 }

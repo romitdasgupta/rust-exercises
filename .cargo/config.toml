@@ -1,0 +1,3 @@
+[alias]
+drill = "run --quiet --example coach -- drill"
+progress = "run --quiet --example coach -- progress"

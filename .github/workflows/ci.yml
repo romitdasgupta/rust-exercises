@@ -28,6 +28,8 @@ jobs:
           cargo fmt --manifest-path exercises/chapter16/random-lab/Cargo.toml --all --check
           cargo fmt --manifest-path exercises/chapter17/regex-lab/Cargo.toml --all --check
           cargo fmt --manifest-path exercises/chapter22/export_lab/Cargo.toml --all --check
+      - name: Lint
+        run: cargo clippy --locked --offline --all-targets --all-features
       # Unfinished exercises intentionally panic. Compile their tests without running them.
       - name: Compile core starters and playground in both profiles
         run: |

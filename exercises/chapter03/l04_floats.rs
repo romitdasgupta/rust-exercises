@@ -48,6 +48,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::approx_constant)] // The literal is the point of this test.
     fn b_circle_area_uses_double_precision() {
         for (radius, expected) in [
             (0.0, 0.0),

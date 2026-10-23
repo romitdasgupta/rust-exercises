@@ -70,6 +70,7 @@ mod tests {
         assert_eq!(d, Delta { x: 5, y: 0 });
     }
     #[test]
+    #[allow(clippy::erasing_op)] // Multiplying by zero is a deliberate edge case.
     fn d_rhs_can_be_another_type() {
         assert_eq!(Delta { x: 3, y: -2 } * 4, Delta { x: 12, y: -8 });
         assert_eq!(Delta { x: 1, y: 2 } * 0, Delta { x: 0, y: 0 });
