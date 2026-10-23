@@ -1,7 +1,7 @@
 //! LESSON 09 — Capstone: a task scheduler and audit
 //! Run: cargo test --test chapter16 l09_
 //!
-//! PREDICT before executing: Choose a container for pending priorities, uniqueness, and
+//! PREDICT before running: Choose a container for pending priorities, uniqueness, and
 //! completion order before coding. Predict duplicate tasks and equal-priority ties.
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
@@ -36,6 +36,11 @@ mod tests {
             merge(&[("a", 2), ("a", 7), ("b", 0), ("a", 3)]),
             HashMap::from([("a".into(), 7), ("b".into(), 0)])
         );
+        assert_eq!(
+            merge(&[("x", 255), ("x", 0), ("é", 1)]),
+            HashMap::from([("x".into(), 255), ("é".into(), 1)])
+        );
+        assert!(merge(&[]).is_empty());
     }
     #[test]
     fn b_scheduler_has_deterministic_ties_and_limits() {
@@ -44,5 +49,13 @@ mod tests {
         assert_eq!(schedule(&tasks, 2), ["z", "a"]);
         assert!(schedule(&tasks, 0).is_empty());
         assert!(schedule(&[], 5).is_empty());
+    }
+    #[test]
+    fn b_duplicates_run_once_at_their_highest_priority() {
+        let tasks = [("b", 1), ("a", 1), ("b", 5), ("c", 5), ("a", 0)];
+        assert_eq!(schedule(&tasks, 3), ["b", "c", "a"]);
+        assert_eq!(schedule(&tasks, 1), ["b"]);
+        let ties = [("B", 2), ("a", 2), ("A", 2)];
+        assert_eq!(schedule(&ties, 3), ["A", "B", "a"], "byte-wise name order");
     }
 }
