@@ -1,0 +1,3 @@
+# proptest saves failing seeds here. In a real project, commit these files so the
+# failures are replayed for everyone; in this practice package they are personal.
+/proptest-regressions/

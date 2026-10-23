@@ -1,0 +1,12 @@
+{
+  "workers": 2,
+  "queue_capacity": 4,
+  "job_timeout_ms": 200,
+  "jobs": [
+    {"id": "warm-cache", "task": {"type": "sleep", "ms": 50}},
+    {"id": "hash-config", "task": {"type": "checksum", "data": "listen=0.0.0.0:8080"}},
+    {"id": "slow-report", "task": {"type": "sleep", "ms": 500}},
+    {"id": "bad-input", "task": {"type": "fail", "message": "row 17: missing customer id"}},
+    {"id": "notify", "task": {"type": "sleep", "ms": 20}}
+  ]
+}
