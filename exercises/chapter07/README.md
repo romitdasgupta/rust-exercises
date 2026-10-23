@@ -6,7 +6,16 @@ Original guided practice for [Programming Rust, 3rd edition, chapter 7](https://
 
 ## Work through the chapter
 
-For each lesson: record predictions before running code; implement only the TODO bodies; run its filtered tests; complete the compiler or transfer lab; explain the result in your own words; add one edge case. Passing tests does not replace the design and explanation work. Some requirements (such as avoiding clones or using a particular construct) need your own code review.
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
+
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter07 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests count heap allocations or compare pointers, so a solution that copies everything fails. Then run `cargo clippy --test chapter07` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch07` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), add one edge-case test, then compare with *Check your explanation* in [HINTS.md](HINTS.md).
+
+After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
 
 | Done | Lesson |
 | --- | --- |
@@ -18,18 +27,23 @@ For each lesson: record predictions before running code; implement only the TODO
 | [ ] | [06 · Custom errors with a source chain](l06_custom.rs) |
 | [ ] | [07 · Impossible errors and deliberate recovery](l07_invariants_ignoring.rs) |
 | [ ] | [08 · Capstone: fallible batch report](l08_capstone.rs) |
+| [ ] | [R01 · Review: Chapters 3, 5 and 6 from memory](r01_review.rs) |
+| [ ] | [C01 · Code review: a teammate's pull request](c01_code_review.rs) |
+| [ ] | [Compiler drills](../../drills/ch07/) — `cargo drill ch07` |
 
 ```sh
 cargo test --test chapter07 l01_
 cargo test --test chapter07 -- --list
 cargo test --test chapter07
 cargo test --release --test chapter07
+cargo clippy --test chapter07
+cargo drill ch07
 cargo run --example ch07_scratch
 ```
 
-The starters compile; tests fail intentionally at `todo!()` until implemented. Work in lesson order and keep tests intact. Every runnable task uses the standard library and needs no network. Compiler labs belong in [the scratch example](../../examples/ch07_scratch.rs), not in the exercise suite. Restore it to compiling code after each intentional error. Any package/tooling lab below is separate from the standard-library tests.
+The starters compile; tests fail intentionally at `todo!()` and `guess()` until you fill them in. Work in lesson order and keep tests intact. Every runnable task uses the standard library and needs no network. Compiler labs belong in [the scratch example](../../examples/ch07_scratch.rs), not in the exercise suite. Restore it to compiling code after each intentional error. Any package/tooling lab below is separate from the standard-library tests.
 
-Use [progressive hints](HINTS.md) only after a first attempt. For review, share your predictions, implementation, and any diagnostic you cannot explain.
+Use [progressive hints](HINTS.md) only after a first attempt.
 
 ## Coverage map
 
