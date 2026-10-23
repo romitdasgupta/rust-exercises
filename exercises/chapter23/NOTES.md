@@ -114,6 +114,26 @@ Your workbook. Write answers in your own words, *before* checking the hints. Whe
 
 - 
 
+## r01 · Spaced retrieval: Chapters 17, 21, and 22 inside Chapter 23
+
+**Predictions I got wrong, and why:**
+
+- 
+
+**Edge case I added:**
+
+- 
+
+## c01 · A teammate's unsafe pull request
+
+**My review, written before running the tests:**
+
+- 
+
+**Edge case I added:**
+
+- 
+
 ## Drills
 
 Drills whose verdict surprised me, and the rule I learned:
