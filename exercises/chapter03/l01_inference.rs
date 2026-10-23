@@ -1,7 +1,8 @@
 //! LESSON 01 — Inference and numeric method lookup
 //! Run: cargo test --test chapter03 l01_
 //!
-//! PREDICT, without running:
+//! PREDICT, without running: first answer `p_predictions` at the bottom (replace
+//! each `guess()` with your answer). Then consider:
 //! 1. What types do `let n = 7;` and `let x = 7.0;` default to without other clues?
 //! 2. Can a function's return type constrain the type of a local empty vector?
 //! 3. Do `(-17_i32).abs()` and `-17_i32.abs()` produce the same value?
@@ -30,6 +31,7 @@ fn absolute_distance() -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
 
     #[test]
     fn a_packet_lengths_follow_the_header() {
@@ -41,5 +43,38 @@ mod tests {
     #[test]
     fn b_abs_applies_to_the_negative_value() {
         assert_eq!(absolute_distance(), 17);
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    /// A wrong prediction is useful: read the failure, then explain it in NOTES.md.
+    #[test]
+    fn p_predictions() {
+        // P1. With no other clues, how many bytes does each default type take?
+        let n = 7;
+        let x = 7.0;
+        let p1: (usize, usize) = guess();
+        assert_eq!(
+            p1,
+            (size_of_val(&n), size_of_val(&x)),
+            "P1: default integer and float types"
+        );
+
+        // P2. Unary minus versus a method call: what do these evaluate to?
+        let p2: (i32, i32) = guess();
+        assert_eq!(
+            p2,
+            (-17_i32.abs(), (-17_i32).abs()),
+            "P2: a method call binds tighter than unary minus"
+        );
+
+        // P3. `a` has no suffix. Its type is decided by the next line.
+        let a = 1;
+        let narrow: u8 = a;
+        let p3: u32 = guess();
+        assert_eq!(
+            p3,
+            a.leading_zeros(),
+            "P3: a later use can fix a literal's type"
+        );
     }
 }

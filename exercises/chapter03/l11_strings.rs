@@ -1,9 +1,11 @@
 //! LESSON 11 — Building text and writing literals
 //! Run: cargo test --test chapter03 l11_
 //!
-//! PREDICT: What are the types of "hi", 'h', "hi".to_string(), and r"\n"?
-//! How many bytes are in r"\n" versus "\n"? What does String::pop return
-//! for a final emoji? What changes between Display and Debug output for text?
+//! PREDICT: first answer `p_predictions` at the bottom (replace each `guess()`
+//! with your answer). Then consider: What are the types of "hi", 'h',
+//! "hi".to_string(), and r"\n"? How many bytes are in r"\n" versus "\n"? What
+//! does String::pop return for a final emoji? What changes between Display and
+//! Debug output for text?
 //!
 //! EXPLAIN: Why accept &str when reading input, and return String for newly
 //! built text? Which value owns the UTF-8 buffer? Does `let mut s = "hi"`
@@ -47,6 +49,7 @@ fn literal_forms() -> (&'static str, &'static str) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
 
     #[test]
     fn a_format_builds_an_owned_result() {
@@ -55,6 +58,10 @@ mod tests {
             "Hi Ada, you have 3 unread messages."
         );
         assert_eq!(inbox_message("李", 1), "Hi 李, you have 1 unread messages.");
+        assert_eq!(
+            inbox_message(" Bo ", 0),
+            "Hi  Bo , you have 0 unread messages."
+        );
     }
 
     #[test]
@@ -94,5 +101,62 @@ mod tests {
         let (escaped, raw) = literal_forms();
         assert_eq!(escaped, "Open \"draft.txt\" in C:\\notes");
         assert_eq!(escaped, raw);
+    }
+
+    #[test]
+    fn b_append_tag_extends_the_existing_buffer() {
+        let mut message = String::with_capacity(64);
+        message.push_str("ready");
+        let buffer = message.as_ptr();
+        let (_, allocations) = count(|| append_tag(&mut message, "lab"));
+        assert_eq!(message, "ready [lab]");
+        assert_eq!(message.as_ptr(), buffer, "append in place");
+        assert_eq!(allocations, 0, "spare capacity means no new String");
+    }
+
+    #[test]
+    fn c_trimmed_list_borrows_before_joining() {
+        let items: Vec<String> = (0..20).map(|i| format!("  item{i} ")).collect();
+        let items: Vec<&str> = items.iter().map(String::as_str).collect();
+        let (joined, allocations) = count(|| trimmed_list(&items));
+        assert!(joined.starts_with("item0 | item1 | "));
+        assert!(
+            allocations <= 3,
+            "trim borrows; only the item list and the result should allocate, \
+             got {allocations}"
+        );
+    }
+
+    #[test]
+    fn d_remove_last_does_not_allocate() {
+        let mut text = String::from("ok🦀");
+        let (last, allocations) = count(|| remove_last(&mut text));
+        assert_eq!(last, Some('🦀'));
+        assert_eq!(allocations, 0, "pop shortens the String in place");
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Byte lengths of a raw literal and an escaped literal.
+        let p1: (usize, usize) = guess();
+        assert_eq!(p1, (r"\n".len(), "\n".len()), "P1: raw versus escaped");
+
+        // P2. The exact text that Debug formatting produces for "tab\t".
+        let p2: String = guess();
+        assert_eq!(p2, format!("{:?}", "tab\t"), "P2: Debug quotes and escapes");
+
+        // P3. How many pieces does split produce here?
+        let p3: usize = guess();
+        assert_eq!(p3, "a,b,,c".split(',').count(), "P3: empty fields count");
+
+        // P4. `+` takes the left String by value. Does the result reuse its
+        // buffer when it already has room?
+        let mut s = String::with_capacity(16);
+        s.push_str("ab");
+        let buffer = s.as_ptr();
+        let joined = s + "cd";
+        let p4: bool = guess();
+        assert_eq!(p4, joined.as_ptr() == buffer, "P4: String + &str");
     }
 }

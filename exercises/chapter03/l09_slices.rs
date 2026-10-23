@@ -1,9 +1,10 @@
 //! LESSON 09 — Borrow a region instead of owning a collection
 //! Run: cargo test --test chapter03 l09_
 //!
-//! PREDICT: Can the same `&[i32]` parameter accept an array, a Vec, and part of
-//! either? What two pieces of information describe a slice reference? Does
-//! making a subslice allocate or copy its elements?
+//! PREDICT: first answer `p_predictions` at the bottom (replace each `guess()`
+//! with your answer). Then consider: Can the same `&[i32]` parameter accept an
+//! array, a Vec, and part of either? What two pieces of information describe a
+//! slice reference? Does making a subslice allocate or copy its elements?
 //!
 //! EXPLAIN: Distinguish `[i32]`, `[i32; 4]`, and `&[i32]`. Why prefer a slice
 //! parameter over `&Vec<i32>`? Why can both arrays and vectors call `sort`?
@@ -33,6 +34,7 @@ fn sort_region(values: &mut [i32], start: usize, end: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
 
     #[test]
     fn a_interior_is_a_view_of_existing_storage() {
@@ -67,5 +69,49 @@ mod tests {
         sort_region(&mut vector, 0, 4);
         assert_eq!(vector, [-1, 0, 2, 2]);
         sort_region(&mut [], 0, 0);
+    }
+
+    #[test]
+    fn a_interior_does_not_allocate() {
+        let values = vec![1, 2, 3, 4];
+        let (middle, allocations) = count(|| interior(&values));
+        assert_eq!(middle, [2, 3]);
+        assert_eq!(allocations, 0, "a subslice borrows; it never copies");
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Size in machine words of a slice reference and an array reference.
+        let p1: (usize, usize) = guess();
+        assert_eq!(
+            p1,
+            (
+                size_of::<&[i32]>() / size_of::<usize>(),
+                size_of::<&[i32; 4]>() / size_of::<usize>()
+            ),
+            "P1: fat and thin references"
+        );
+
+        // P2. The subslice's length, its first element, and allocations made.
+        let v = [1, 2, 3, 4];
+        let (s, allocations) = count(|| &v[1..3]);
+        let p2: (usize, i32, usize) = guess();
+        assert_eq!(p2, (s.len(), s[0], allocations), "P2: subslices");
+
+        // P3. A method on a subslice changes only that region.
+        let mut a = [5, 3, 1, 4];
+        a[..2].reverse();
+        let p3: [i32; 4] = guess();
+        assert_eq!(p3, a, "P3: reverse a prefix");
+
+        // P4. How many chunks of 2, and how many windows of 2?
+        let data = [1, 2, 3, 4, 5];
+        let p4: (usize, usize) = guess();
+        assert_eq!(
+            p4,
+            (data.chunks(2).count(), data.windows(2).count()),
+            "P4: chunks versus windows"
+        );
     }
 }
