@@ -21,6 +21,8 @@ Every lesson uses the same loop. It is built on *retrieval practice*: you keep w
 
 After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
 
+Open [HINTS.md](HINTS.md) one hint at a time, and only after a real attempt. Passing tests alone does not demonstrate mastery.
+
 | Done | Lesson | Check |
 | --- | --- | --- |
 | [ ] | [01 · Unicode scalar operations and encoding](l01_unicode.rs) | `cargo test --test chapter17 l01_` |
