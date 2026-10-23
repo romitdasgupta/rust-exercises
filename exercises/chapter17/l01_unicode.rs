@@ -1,7 +1,8 @@
 //! LESSON 01 — Unicode scalar operations and encoding
 //! Run: cargo test --test chapter17 l01_
 //!
-//! PREDICT before executing: How many bytes/scalars are in "e\u{301}" and "🦀"? Can char
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: How many bytes/scalars are in "e\u{301}" and "🦀"? Can char
 //! represent a surrogate or an entire grapheme cluster?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
@@ -39,6 +40,7 @@ fn classify(ch: char) -> (bool, bool, Option<u32>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
     #[test]
     fn a_byte_offsets_differ_from_scalar_positions() {
         assert_eq!(
@@ -47,6 +49,7 @@ mod tests {
         );
         assert_eq!(measures("e\u{301}").0, 3);
         assert_eq!(measures("e\u{301}").1, 2);
+        assert_eq!(measures(""), (0, 0, vec![]));
     }
     #[test]
     fn b_codepoints_validate_and_case_mapping_can_expand() {
@@ -54,6 +57,12 @@ mod tests {
         assert_eq!(uppercase_codepoint('é' as u32), Some("É".into()));
         assert_eq!(uppercase_codepoint(0xD800), None);
         assert_eq!(uppercase_codepoint(0x110000), None);
+        assert_eq!(uppercase_codepoint('7' as u32), Some("7".into()));
+        assert_eq!(
+            uppercase_codepoint(0x149),
+            Some("\u{2BC}N".into()),
+            "ŉ -> ʼN"
+        );
     }
     #[test]
     fn c_classification_distinguishes_ascii_digits() {
@@ -61,5 +70,46 @@ mod tests {
         assert_eq!(classify('\u{2003}'), (false, true, None));
         assert_eq!(classify('7'), (false, false, Some(7)));
         assert_eq!(classify('٧'), (false, false, None));
+        assert_eq!(classify('a'), (true, false, None), "not a hex digit here");
+        assert_eq!(classify('F'), (true, false, None));
+        assert_eq!(classify('\n'), (false, true, None));
+        assert_eq!(classify('0'), (false, false, Some(0)));
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    /// A wrong prediction is useful: read the failure, then explain it in NOTES.md.
+    #[test]
+    fn p_predictions() {
+        // P1. UTF-8 byte lengths of three strings that each look like one character.
+        let p1: (usize, usize, usize) = guess();
+        assert_eq!(
+            p1,
+            ("é".len(), "e\u{301}".len(), "🦀".len()),
+            "P1: bytes per string"
+        );
+
+        // P2. A surrogate code point, and the digit 15 in base 16.
+        let p2: (Option<char>, Option<char>) = guess();
+        assert_eq!(
+            p2,
+            (char::from_u32(0xD800), char::from_digit(15, 16)),
+            "P2: char conversions"
+        );
+
+        // P3. Lowercasing 'İ' (capital I with dot above): how many scalars come out?
+        let p3: usize = guess();
+        assert_eq!(
+            p3,
+            'İ'.to_lowercase().count(),
+            "P3: case mapping can expand"
+        );
+
+        // P4. Distance from 'A' to 'Z' as code points, and the UTF-8 length of 'é'.
+        let p4: (u32, usize) = guess();
+        assert_eq!(
+            p4,
+            ('Z' as u32 - 'A' as u32, 'é'.len_utf8()),
+            "P4: char as u32"
+        );
     }
 }

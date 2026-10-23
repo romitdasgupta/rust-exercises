@@ -1,7 +1,8 @@
 //! LESSON 06 — The formatting language
 //! Run: cargo test --test chapter17 l06_
 //!
-//! PREDICT before executing: Does field width truncate long text? What does precision mean
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: Does field width truncate long text? What does precision mean
 //! for a string versus a float? Is terminal column width equal to formatting width?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
@@ -34,11 +35,14 @@ fn debug_values(values: &[i32]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
     #[test]
     fn a_dynamic_parameters_control_alignment_and_rounding() {
         assert_eq!(row("air", 1.25, 5, 1), "  air: 1.2");
         assert_eq!(row("é", 2.0, 3, 2), "  é: 2.00");
         assert_eq!(row("long", 0.0, 2, 0), "long: 0");
+        assert_eq!(row("🦀", 9.999, 2, 2), " 🦀: 10.00");
+        assert_eq!(row("", 3.0, 0, 3), ": 3.000");
     }
     #[test]
     fn b_numeric_flags_keep_prefix_before_padding() {
@@ -50,5 +54,30 @@ mod tests {
     fn c_debug_format_uses_standard_collection_syntax() {
         assert_eq!(debug_values(&[1, -2]), "[1, -2]");
         assert_eq!(debug_values(&[]), "[]");
+        assert_eq!(debug_values(&[i32::MIN]), "[-2147483648]");
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Does a width smaller than the text truncate it?
+        let p1: String = guess();
+        assert_eq!(p1, format!("{:>4}", "toolong"), "P1: width is a minimum");
+
+        // P2. Precision on a string.
+        let p2: String = guess();
+        assert_eq!(p2, format!("{:.2}", "abcdef"), "P2: precision on str");
+
+        // P3. Sign with zero padding, and alternate binary.
+        let p3: (String, String) = guess();
+        assert_eq!(
+            p3,
+            (format!("{:+05}", 7), format!("{:#b}", 5)),
+            "P3: numeric flags"
+        );
+
+        // P4. Scientific notation.
+        let p4: String = guess();
+        assert_eq!(p4, format!("{:e}", 1234.5), "P4: {{:e}}");
     }
 }
