@@ -59,18 +59,30 @@ mod tests {
         items.iter().map(|s| s.to_string()).collect()
     }
 
+    // Accept both the original Option<String> and an improved Option<&str>.
+    fn text(value: Option<impl AsRef<str>>) -> Option<String> {
+        value.map(|v| v.as_ref().to_string())
+    }
+
+    fn length(value: Option<impl AsRef<str>>) -> Option<usize> {
+        value.map(|v| v.as_ref().len())
+    }
+
     #[test]
     fn a_longest_counts_scalars_and_keeps_the_first_tie() {
         let names = strings(&["ééé", "abcd", "wxyz"]);
-        assert_eq!(longest(&names).as_deref(), Some("abcd"));
-        assert_eq!(longest(&strings(&["ab", "cd"])).as_deref(), Some("ab"));
-        assert_eq!(longest(&Vec::new()).as_deref(), None);
+        assert_eq!(text(longest(&names)).as_deref(), Some("abcd"));
+        assert_eq!(
+            text(longest(&strings(&["ab", "cd"]))).as_deref(),
+            Some("ab")
+        );
+        assert_eq!(text(longest(&Vec::new())), None);
     }
 
     #[test]
     fn a_longest_borrows_instead_of_copying() {
         let names = strings(&["one", "three", "five"]);
-        let (best, allocations) = count(|| longest(&names).as_deref().map(str::len));
+        let (best, allocations) = count(|| length(longest(&names)));
         assert_eq!(best, Some(5));
         assert_eq!(
             allocations, 0,
