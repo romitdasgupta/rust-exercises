@@ -34,6 +34,7 @@ impl<F: Future> Future for WithTag<F> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::alloc::count;
     fn ready<F: std::future::Future>(future: F) -> F::Output {
         let mut f = std::pin::pin!(future);
         let mut cx = std::task::Context::from_waker(std::task::Waker::noop());
@@ -43,7 +44,7 @@ mod tests {
         }
     }
     #[test]
-    fn adapter_accepts_a_non_unpin_async_future() {
+    fn a_b_adapter_accepts_a_non_unpin_async_future() {
         let f = async {
             let s = String::from("borrowed");
             let r = &s;
@@ -53,7 +54,7 @@ mod tests {
         assert_eq!(ready(tagged(f, "task".into())), ("task".into(), 8));
     }
     #[test]
-    fn pending_preserves_tag_and_inner_address() {
+    fn a_b_pending_preserves_tag_and_inner_address() {
         let mut f = tagged(std::future::pending::<()>(), "waiting".into());
         let address = &*f.inner as *const _;
         assert!(
@@ -64,5 +65,53 @@ mod tests {
         assert_eq!(f.tag.as_deref(), Some("waiting"));
         let moved = f;
         assert_eq!(&*moved.inner as *const _, address);
+    }
+    #[test]
+    fn a_tagged_allocates_at_most_once() {
+        let tag = String::from("t");
+        let (f, allocations) = count(|| tagged(async { [0u8; 64] }, tag));
+        assert!(
+            allocations <= 1,
+            "one Box for the future; got {allocations}"
+        );
+        assert_eq!(ready(f).1, [0u8; 64]);
+    }
+    #[test]
+    fn b_tag_is_moved_out_not_cloned() {
+        let tag = String::from("owned tag");
+        let p = tag.as_ptr();
+        let (out, _) = ready(tagged(std::future::ready(1), tag));
+        assert_eq!(out.as_ptr(), p);
+    }
+    #[test]
+    fn b_polling_in_place_does_not_allocate() {
+        let mut f = tagged(std::future::pending::<u8>(), "x".into());
+        let mut cx = Context::from_waker(std::task::Waker::noop());
+        let (_, allocations) = count(|| {
+            for _ in 0..10 {
+                assert!(Pin::new(&mut f).poll(&mut cx).is_pending());
+            }
+        });
+        assert_eq!(allocations, 0, "poll the pinned future in place");
+    }
+    #[test]
+    fn b_inner_pending_then_ready() {
+        let mut yielded = false;
+        let inner = std::future::poll_fn(move |cx| {
+            if yielded {
+                Poll::Ready("done")
+            } else {
+                yielded = true;
+                cx.waker().wake_by_ref();
+                Poll::Pending
+            }
+        });
+        let mut f = tagged(inner, "two-step".into());
+        let mut cx = Context::from_waker(std::task::Waker::noop());
+        assert!(Pin::new(&mut f).poll(&mut cx).is_pending());
+        assert_eq!(
+            Pin::new(&mut f).poll(&mut cx),
+            Poll::Ready(("two-step".to_string(), "done"))
+        );
     }
 }
