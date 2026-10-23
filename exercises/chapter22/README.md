@@ -4,11 +4,20 @@
 
 Original exercises accompanying [Programming Rust, 3rd edition, chapter 22](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch22.html). Read the corresponding section, then practice without copying the book's examples.
 
-## Working route
+## Work through the chapter
 
-Predict on paper first. Implement one lesson's TODOs, run its filtered tests, do its scratch experiment, and explain the result in your own words. Add one edge case of your own. Open [HINTS.md](HINTS.md) only after an attempt. Passing tests is one part of mastery; the explanation and labs matter too.
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
 
-The starter compiles; unfinished TODOs intentionally fail when reached. Keep the supplied tests. Each lesson is independent, including the capstone, so later unfinished tasks do not block an earlier lesson.
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter22 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests count heap allocations, evaluations, or threads, so a macro that copies, re-evaluates, or collects eagerly fails. Then run `cargo clippy --test chapter22` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch22` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), add one edge-case test, then compare with *Check your explanation* in [HINTS.md](HINTS.md).
+
+After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
+
+Each lesson is independent, including the capstone, so later unfinished tasks do not block an earlier lesson.
 
 | Done | Lesson | Coding tasks |
 | --- | --- | --- |
@@ -19,17 +28,23 @@ The starter compiles; unfinished TODOs intentionally fail when reached. Keep the
 | [ ] | [l05 · Traits handle macro leaf types](l05_traits.rs) | 2 |
 | [ ] | [l06 · Exports and hygiene](l06_exports.rs) | 2 |
 | [ ] | [l07 · Capstone: structured events](l07_capstone.rs) | 2 |
+| [ ] | [R01 · Review: Chapters 15, 19, and 21 from memory](r01_review.rs) | 3 |
+| [ ] | [C01 · Code review: a teammate's macro pull request](c01_code_review.rs) | 3 |
+| [ ] | [Compiler drills](../../drills/ch22/) — `cargo drill ch22` | 10 |
 
 ```sh
 cargo test --test chapter22 l01_
 cargo test --test chapter22 -- --list
-# After completing all lessons:
 cargo test --test chapter22
 cargo test --release --test chapter22
+cargo clippy --test chapter22
+cargo drill ch22
 cargo run --example ch22_scratch
 ```
 
-Use [the scratch example](../../examples/ch22_scratch.rs) for experiments and restore it to a compiling state afterward. Core lessons use only the standard library. Dependency or platform labs have their own instructions and are outside the normal test target.
+The starters compile; tests fail intentionally at `todo!()` and `guess()` until you fill them in. Keep the supplied tests intact. Every runnable task uses the standard library and needs no network. Free-form compiler experiments belong in [the scratch example](../../examples/ch22_scratch.rs); restore it to compiling code afterward. Dependency or platform labs have their own instructions and are outside the normal test target.
+
+Use [progressive hints](HINTS.md) only after a first attempt.
 
 ## Coverage map
 
@@ -37,12 +52,12 @@ The section labels below follow the book's contents. A mapping to a lab means a 
 
 | Book sections | Practice |
 | --- | --- |
-| Macro Basics; Basics of Macro Expansion; Unintended Consequences | l01 expression expansion and evaluation once |
+| Macro Basics; Basics of Macro Expansion; Unintended Consequences | l01 expression expansion and evaluation once; c01 double evaluation; drills d03–d04 |
 | Repetition | l02 repeated key/value pairs and trailing commas |
 | Built-In Macros; Debugging Macros | l01 location macro; LABS.md expansion/diagnostics |
 | Building the json! Macro; Fragment Types | l03 fragment contracts and l04 recursive data literals |
 | Recursion in Macros; Using Traits with Macros | l04 and l05 trait-directed leaves |
-| Scoping and Hygiene; Importing and Exporting Macros | l06 exported helper paths and local names |
+| Scoping and Hygiene; Importing and Exporting Macros | l06 exported helper paths and local names; c01 `$crate` review; drills d02, d06, d08–d09 |
 | Beyond macro_rules! | LABS.md isolated procedural derive/attribute project |
 | Cross-section application | l07 event-construction capstone |
 
