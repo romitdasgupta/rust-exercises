@@ -170,12 +170,12 @@ There are two bugs: one comparison lets the bin hold one item too many, and one 
 </details>
 <details><summary>Hint 2</summary>
 
-Make `items` private and return `&[String]` from `items()`; the tests call only methods. Compare with `>=`. Replace `static mut` with a private `static NEXT_ID: AtomicU32` and return `NEXT_ID.fetch_add(1, Ordering::Relaxed) + 1`.
+Make `items` private and return `&[String]` from `items()`; the tests call only methods. Compare with `>=`. Make the read and the write one atomic step: return `NEXT_ID.fetch_add(1, Ordering::Relaxed) + 1`.
 
 </details>
 <details><summary>Check your review</summary>
 
-`Bin::add` checks `len() > CAPACITY`, so a fifth item fits; and because `items` is `pub`, any caller can push past the limit anyway, so the type cannot promise its invariant. Make the field private; the module boundary is what makes the invariant enforceable. `items()` clones the whole vector on every call where a borrowed `&[String]` is enough. `next_id` mutates a `static mut` inside `unsafe` with no synchronization: two threads can read the same value and both return it, which is a data race and undefined behavior. An `AtomicU32` with `fetch_add` is safe, lock-free, and needs no `unsafe` at all.
+`Bin::add` checks `len() > CAPACITY`, so a fifth item fits; and because `items` is `pub`, any caller can push past the limit anyway, so the type cannot promise its invariant. Make the field private; the module boundary is what makes the invariant enforceable. `items()` clones the whole vector on every call where a borrowed `&[String]` is enough. `next_id` loads and then stores as two separate steps: two threads can load the same value and both return it (a lost update). Each operation is atomic, so this is not undefined behavior, but the sequence is not. `fetch_add` makes read-modify-write a single atomic step. The `static mut` version this replaces would have been worse: a real data race, which is undefined behavior.
 
 </details>
 

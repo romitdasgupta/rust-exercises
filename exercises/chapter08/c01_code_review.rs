@@ -6,7 +6,7 @@
 //! and most behavior tests pass. Your job:
 //! 1. Before running anything, read the code and write a review in NOTES.md:
 //!    list every bug, every invariant the module boundary fails to protect,
-//!    and every unnecessary allocation or `unsafe`.
+//!    and every unnecessary allocation or race.
 //! 2. Run the tests. Compare what they found with your review.
 //! 3. Fix it. You MAY change field visibility, return types, and how the
 //!    counter is stored where the doc comments say so; the tests are written
@@ -40,15 +40,16 @@ mod inventory {
         }
     }
 
-    static mut NEXT_ID: u32 = 0;
+    use std::sync::atomic::{AtomicU32, Ordering};
+
+    static NEXT_ID: AtomicU32 = AtomicU32::new(0);
 
     /// Return a new id: 1, 2, 3, ... Never returns the same id twice, even
-    /// when called from many threads. You may change how the counter is stored.
+    /// when called from many threads. You may change how the counter is updated.
     pub fn next_id() -> u32 {
-        unsafe {
-            NEXT_ID += 1;
-            NEXT_ID
-        }
+        let id = NEXT_ID.load(Ordering::Relaxed) + 1;
+        NEXT_ID.store(id, Ordering::Relaxed);
+        id
     }
 }
 
