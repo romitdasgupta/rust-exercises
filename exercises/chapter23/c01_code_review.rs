@@ -12,7 +12,9 @@
 //! 3. Fix it. Prefer safe std APIs; keep `unsafe` only where it buys something
 //!    and justify it with a SAFETY comment. You MAY make `copy_prefix` a safe
 //!    fn; the tests compile either way.
-//! 4. Run clippy and resolve its warnings (and rustc's) for this file.
+//! 4. Run clippy and resolve its warnings (and rustc's) for this file. Add
+//!    `-- -W clippy::undocumented_unsafe_blocks` to find unsafe blocks that
+//!    lack a SAFETY comment.
 
 /// Move the last `n` labels (all of them if fewer exist) out of `labels`
 /// into a new Vec, keeping their order. Do not clone any String.
