@@ -27,6 +27,8 @@ Each element exists to build long-term, usable skill rather than short-term reco
   - Every prediction must be deterministic across platforms (64-bit Linux/macOS/Windows) and both profiles. Avoid hash iteration order, capacities after growth, and thread interleavings, unless the prediction is "it is unspecified", which a test cannot check.
   - Conceptual or "does it compile" questions belong in drills or NOTES, not here.
 - **Technique tests** where the contract states a technique ("no clones", "borrow", "in place", "one allocation", "use threads"). Add `use practice::alloc::count;` and assert upper bounds: `assert!(allocations <= n, "...")` or `== 0`. Never assert an exact non-zero count in technique tests; release builds can elide allocations. Other tools: `as_ptr()` and `ptr::eq` identity, `Rc::ptr_eq`, counting distinct `thread::current().id()`, `size_of`, drop logs.
+- Code that can deadlock under a wrong solution runs on a spawned thread, and the test waits with `recv_timeout`, so it fails with a message instead of hanging the suite. Async lessons can use counting or lock-probing wakers.
+- Beware panic payloads: `panic!("literal")` and `panic!("x {}", 2)` with only literal arguments give a `&'static str` payload, while a formatted value gives a `String`.
 - A chapter that uses `count` needs this once in its `mod.rs`:
 
   ```rust

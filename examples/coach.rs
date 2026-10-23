@@ -582,10 +582,9 @@ fn progress() -> Result<(), String> {
             // Keep an untouched copy so `cargo progress redo` can restore it.
             if let Some(file) = &lesson.file {
                 let starter = starter_path(file);
-                let expected_passes = fs::read_to_string(file)
-                    .map(|t| t.matches("should_panic").count())
-                    .unwrap_or(0);
-                if lesson.failed > 0 && lesson.passed <= expected_passes && !starter.exists() {
+                // The first sighting of an unfinished lesson is taken as its
+                // starter; run `cargo progress` before editing a lesson.
+                if lesson.failed > 0 && !starter.exists() {
                     if let Some(dir) = starter.parent() {
                         fs::create_dir_all(dir).map_err(|e| e.to_string())?;
                     }

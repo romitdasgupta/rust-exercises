@@ -18,6 +18,8 @@ cargo test --locked --offline --release --all-targets --no-run
 cargo progress
 ```
 
+Run `cargo progress` once before you edit anything: it saves a copy of every untouched lesson so you can redo it later.
+
 The build commands compile every exercise without running unfinished functions. The core needs no external crates or network access once Rust is installed. Run all commands from the repository root unless a lab says otherwise.
 
 Every exercise starts unfinished: tests fail at `todo!()` and `guess()` until you fill them in. That's the starting state, not a broken setup.
