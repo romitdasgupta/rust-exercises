@@ -29,10 +29,12 @@ jobs:
           cargo fmt --manifest-path exercises/chapter17/regex-lab/Cargo.toml --all --check
           cargo fmt --manifest-path exercises/chapter22/export_lab/Cargo.toml --all --check
           cargo fmt --manifest-path ecosystem/Cargo.toml --all --check
+          cargo fmt --manifest-path project/Cargo.toml --all --check
       - name: Lint
         run: |
           cargo clippy --locked --offline --all-targets --all-features
           cargo clippy --manifest-path ecosystem/Cargo.toml --locked --all-targets -- -D warnings
+          cargo clippy --manifest-path project/Cargo.toml --locked --offline --all-targets
       - name: Test the support library and the coach
         run: cargo test --locked --offline --lib --example coach
       # Unfinished exercises intentionally panic. Compile their tests without running them.
@@ -42,7 +44,7 @@ jobs:
           cargo test --locked --offline --release --all-targets --all-features --no-run
       - name: Compile extension starters in both profiles
         run: |
-          for manifest in exercises/chapter16/random-lab/Cargo.toml exercises/chapter17/regex-lab/Cargo.toml exercises/chapter22/export_lab/Cargo.toml ecosystem/Cargo.toml; do
+          for manifest in exercises/chapter16/random-lab/Cargo.toml exercises/chapter17/regex-lab/Cargo.toml exercises/chapter22/export_lab/Cargo.toml ecosystem/Cargo.toml project/Cargo.toml; do
             cargo test --manifest-path "$manifest" --locked --all-targets --no-run
             cargo test --manifest-path "$manifest" --locked --release --all-targets --no-run
           done

@@ -24,3 +24,8 @@ Open only the chapter and lesson you are working on. Each lesson has two hint le
 - [22 · Macros](exercises/chapter22/HINTS.md)
 - [23 · Unsafe Code](exercises/chapter23/HINTS.md)
 - [24 · Foreign Functions](exercises/chapter24/HINTS.md)
+
+Outside the chapters:
+
+- [loglens running project](project/HINTS.md)
+- [Production crates](ecosystem/HINTS.md)

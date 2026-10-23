@@ -2,7 +2,7 @@
 
 A chapter-by-chapter practice companion to [*Programming Rust*, 3rd edition](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/), covering Chapter 3 and every remaining technical chapter (4–24).
 
-Chapters 3–24 contain **180 guided lessons, 21 spaced-review lessons, 22 code-review lessons, about 550 checked predictions, 217 compiler drills, and over 1,000 tests**. Every chapter includes a capstone and a map from the book sections to its exercises or labs. Two further tracks take you from the book to everyday professional Rust: a [production-crates track](ecosystem/README.md), and a project you build across the chapters (see [Beyond the book](#beyond-the-book)).
+Chapters 3–24 contain **180 guided lessons, 21 spaced-review lessons, 22 code-review lessons, about 550 checked predictions, 217 compiler drills, and over 1,000 tests**. Every chapter includes a capstone and a map from the book sections to its exercises or labs. Two further tracks take you from the book to everyday professional Rust: a [production-crates track](ecosystem/README.md), and [loglens](project/README.md), a real program you grow and refactor across the chapters (see [Beyond the book](#beyond-the-book)).
 
 The exercises are original practice problems, not a reproduction of the book. Read the corresponding chapter alongside them. Each chapter has its own guide, lessons, compiler drills, progressive hints with model explanations, a notes workbook, a coverage map, and a capstone.
 
@@ -142,6 +142,7 @@ The supported toolchain is Rust 1.99.0, pinned in `rust-toolchain.toml`; the pac
 
 | Track | When | What it practices |
 | --- | --- | --- |
+| [loglens, the running project](project/README.md) | Start after Chapter 3; each milestone follows its chapter | One real command-line log analyzer built in 16 milestones across Chapters 3–24: zero-copy parsing, error types, traits, closures, iterator pipelines, reports, streaming I/O, parallel files, macros, and an optional async reader and unsafe fast path. Later milestones refactor earlier code with new tools, while the earlier tests keep you safe. Standard library only. `cd project && cargo test --test m03_types` |
 | [Production crates](ecosystem/README.md) | E01 after Chapter 7; the rest as their chapters are done | serde, thiserror and anyhow, clap, tracing, proptest, tokio, and everyday Cargo tooling, with "why this crate, and what are the alternatives" judgment for each. A standalone package with pinned dependencies (one download, then offline). |
 
 ## Labs that need another tool or crate
@@ -168,7 +169,7 @@ A green test result checks the required behavior. It does not prove that you use
 
 ## Validation scope
 
-A clean starter checkout should compile all 22 chapter targets (3–24) and their scratch examples offline in debug and release profiles using the fresh-clone commands above. Formatting is checked separately. The isolated random, regex, external macro-consumer, and production-crates packages have their own manifests and are not included in the root Cargo checks. The random, regex, and production-crates packages need a dependency download before offline builds work. The [starter CI workflow](.github/workflows/ci.yml) checks formatting and clippy, runs the coach's own tests, and compiles the core (including the playground) and every extension package in both profiles on Linux, macOS, and Windows; it deliberately does not execute unfinished exercises.
+A clean starter checkout should compile all 22 chapter targets (3–24) and their scratch examples offline in debug and release profiles using the fresh-clone commands above. Formatting is checked separately. The isolated random, regex, external macro-consumer, production-crates, and loglens packages have their own manifests and are not included in the root Cargo checks. The random, regex, and production-crates packages need a dependency download before offline builds work. The [starter CI workflow](.github/workflows/ci.yml) checks formatting and clippy, runs the coach's own tests, and compiles the core (including the playground) and every extension package in both profiles on Linux, macOS, and Windows; it deliberately does not execute unfinished exercises.
 
 Running unfinished tests is expected to fail. Compilation checks establish that a learner can start; they do not establish that unfinished implementations are correct. No complete reference solution is shipped. Tests also do not prove that an unsafe abstraction is sound for every possible caller: its written safety argument is part of the exercise.
 
