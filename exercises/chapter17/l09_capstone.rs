@@ -1,7 +1,7 @@
 //! LESSON 09 — Capstone: a Unicode-aware report parser
 //! Run: cargo test --test chapter17 l09_
 //!
-//! PREDICT before executing: Predict parsing, rejection, byte/scalar counts, and output for
+//! PREDICT before running: Predict parsing, rejection, byte/scalar counts, and output for
 //! non-ASCII names. Decide whether a user-perceived character limit is in scope.
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
@@ -47,7 +47,15 @@ mod tests {
                 value: 42
             })
         );
-        for input in ["=1", "a=65536", "a=-1", "a=1=2", "missing", "a="] {
+        for input in [
+            "=1",
+            "a=65536",
+            "a=-1",
+            "a=1=2",
+            "missing",
+            "a=",
+            " \u{2003}=1",
+        ] {
             assert_eq!(parse_record(input), Err("invalid record"), "{input}");
         }
     }
@@ -68,6 +76,16 @@ mod tests {
             ]
         );
         assert_eq!(bad, [4, 6]);
+        let (rows, bad) = read_report("  # indented comment\r\nx = 1\r\n\r\n#=2\n");
+        assert_eq!(
+            rows,
+            [Record {
+                name: "x".into(),
+                value: 1
+            }]
+        );
+        assert!(bad.is_empty());
+        assert_eq!(read_report(""), (vec![], vec![]));
     }
     #[test]
     fn c_output_uses_scalar_counts_and_exact_line_endings() {

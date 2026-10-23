@@ -4,9 +4,20 @@
 
 Original exercises accompanying [Programming Rust, 3rd edition, chapter 18](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch18.html). Read the corresponding section, then practice without copying the book's examples.
 
-## Working route
+## Work through the chapter
 
-Predict on paper first. Implement one lesson's TODOs, run its filtered tests, do its scratch experiment, and explain the result in your own words. Add one edge case of your own. Open [HINTS.md](HINTS.md) only after an attempt. Passing tests is one part of mastery; the explanation and labs matter too.
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
+
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter18 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests use readers and writers that return one byte at a time, fail on purpose, or record how they were called, so a solution that assumes one `read` fills the buffer fails. Then run `cargo clippy --test chapter18` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch18` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), add one edge case of your own, complete the lesson's lab in [the scratch example](../../examples/ch18_scratch.rs), then compare with *Check your explanation* in [HINTS.md](HINTS.md).
+
+After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
+
+Open [HINTS.md](HINTS.md) one hint at a time, and only after a real attempt. Passing tests alone does not demonstrate mastery.
 
 The starter compiles; unfinished TODOs intentionally fail when reached. Keep the supplied tests. Each lesson is independent, including the capstone, so later unfinished tasks do not block an earlier lesson.
 
@@ -19,6 +30,9 @@ The starter compiles; unfinished TODOs intentionally fail when reached. Keep the
 | [ ] | [l05 · Paths preserve OS data](l05_paths.rs) | 2 |
 | [ ] | [l06 · Directory metadata](l06_directories.rs) | 2 |
 | [ ] | [l07 · Capstone: a bounded record service](l07_capstone.rs) | 2 |
+| [ ] | [r01 · Review: Chapters 3, 7, 11, 15–17 from memory](r01_review.rs) | 3 |
+| [ ] | [c01 · Code review: a teammate's pull request](c01_code_review.rs) | review + fix |
+| [ ] | [Compiler drills](../../drills/ch18/) — `cargo drill ch18` | 9 drills |
 
 ```sh
 cargo test --test chapter18 l01_
@@ -26,6 +40,8 @@ cargo test --test chapter18 -- --list
 # After completing all lessons:
 cargo test --test chapter18
 cargo test --release --test chapter18
+cargo clippy --test chapter18
+cargo drill ch18
 cargo run --example ch18_scratch
 ```
 
