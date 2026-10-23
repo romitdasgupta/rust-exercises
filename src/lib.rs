@@ -49,17 +49,25 @@ pub mod alloc {
     unsafe impl GlobalAlloc for Counting {
         unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
             record();
+            // SAFETY: the caller upholds this method's GlobalAlloc contract,
+            // which we forward unchanged.
             unsafe { System.alloc(layout) }
         }
         unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
             record();
+            // SAFETY: the caller upholds this method's GlobalAlloc contract,
+            // which we forward unchanged.
             unsafe { System.alloc_zeroed(layout) }
         }
         unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
             record();
+            // SAFETY: the caller upholds this method's GlobalAlloc contract,
+            // which we forward unchanged.
             unsafe { System.realloc(ptr, layout, new_size) }
         }
         unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+            // SAFETY: the caller upholds this method's GlobalAlloc contract,
+            // which we forward unchanged.
             unsafe { System.dealloc(ptr, layout) }
         }
     }
