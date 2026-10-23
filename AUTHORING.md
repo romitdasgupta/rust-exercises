@@ -45,6 +45,7 @@ Each element exists to build long-term, usable skill rather than short-term reco
 - Ships *working-looking* code (no `todo!()`) written the way a hurried teammate might: 2–3 functions, 2 real bugs, plus avoidable clones, needless allocation, wrong ownership in signatures, `unwrap()` where errors should propagate, non-idiomatic loops, missed std APIs, or concurrency/unsafe hazards suited to the chapter.
 - Tests: behavior tests that expose the bugs (some pass at the start, which is realistic) and technique tests that expose the smells.
 - If a better signature is part of the fix, write the tests so they compile with both the starting and the improved signature (for example `.as_deref()` on the result, or passing `&vec` where `&[T]` will be accepted), and say in the doc comment that the type may change.
+- Some clippy lints are deny-level (for example `derived_hash_with_manual_eq`, `approx_constant`, `erasing_op`). Seeded smells must stay at warning level so `cargo clippy` still builds; use a manual impl or a targeted `#[allow]` with a comment.
 - The header follows Chapter 4: review in NOTES.md first, then run the tests, fix the code, and clear clippy warnings.
 
 ## Drills (`drills/chNN/dNN_name.rs`)
