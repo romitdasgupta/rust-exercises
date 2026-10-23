@@ -56,6 +56,8 @@ A good session is 45–60 minutes: clear any reviews that are due first, then co
 
 Your progress history lives in `.progress/`, which Git ignores.
 
+When you finish a chapter, also fill in its row in [DECISIONS.md](DECISIONS.md). It condenses the chapter into the judgment calls you make while writing real code: borrow or own, generic or `dyn`, `Mutex` or channel.
+
 ### Tools at a glance
 
 | Command | What it does |
