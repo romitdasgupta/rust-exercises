@@ -1,7 +1,8 @@
 //! LESSON 03 — A completion cell
 //! Run: cargo test --test chapter21 l03_
 //!
-//! PREDICT before running:
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider:
 //! 1. Must poll replace an old waker when the executor supplies a new one?
 //! 2. Should a completion function invoke wake while holding its state mutex?
 //!
@@ -46,10 +47,9 @@ impl<T> Complete<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::{
-        Arc,
-        atomic::{AtomicUsize, Ordering},
-    };
+    use practice::guess;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::task::Wake;
     struct Counter(AtomicUsize);
     impl std::task::Wake for Counter {
         fn wake(self: Arc<Self>) {
@@ -64,8 +64,22 @@ mod tests {
         let w = std::task::Waker::from(Arc::clone(&c));
         (c, w)
     }
+    /// A waker that records whether `lock` was free at the moment it was woken.
+    struct Probe<T> {
+        lock: Arc<Mutex<T>>,
+        seen: Mutex<Vec<bool>>,
+    }
+    impl<T: Send> Wake for Probe<T> {
+        fn wake(self: Arc<Self>) {
+            self.wake_by_ref();
+        }
+        fn wake_by_ref(self: &Arc<Self>) {
+            let free = self.lock.try_lock().is_ok();
+            self.seen.lock().unwrap().push(free);
+        }
+    }
     #[test]
-    fn complete_before_poll_is_ready() {
+    fn a_b_c_complete_before_poll_is_ready() {
         let (tx, mut rx) = completion();
         tx.finish(String::from("ok"));
         let mut cx = Context::from_waker(Waker::noop());
@@ -75,7 +89,7 @@ mod tests {
         );
     }
     #[test]
-    fn latest_registered_waker_is_used() {
+    fn a_b_c_latest_registered_waker_is_used() {
         let (tx, mut rx) = completion();
         let (a, wa) = counted();
         let (b, wb) = counted();
@@ -96,5 +110,75 @@ mod tests {
             Pin::new(&mut rx).poll(&mut Context::from_waker(&wb)),
             Poll::Ready(17)
         );
+    }
+    #[test]
+    fn a_b_dropped_producer_leaves_the_receiver_pending() {
+        let (tx, mut rx) = completion::<u8>();
+        drop(tx);
+        let (c, w) = counted();
+        assert!(
+            Pin::new(&mut rx)
+                .poll(&mut Context::from_waker(&w))
+                .is_pending()
+        );
+        assert_eq!(c.0.load(Ordering::Relaxed), 0);
+    }
+    #[test]
+    fn c_wake_happens_after_unlocking() {
+        let (tx, mut rx) = completion::<u32>();
+        let probe = Arc::new(Probe {
+            lock: Arc::clone(&rx.0),
+            seen: Mutex::new(Vec::new()),
+        });
+        let waker = Waker::from(Arc::clone(&probe));
+        assert!(
+            Pin::new(&mut rx)
+                .poll(&mut Context::from_waker(&waker))
+                .is_pending()
+        );
+        tx.finish(5);
+        assert_eq!(
+            *probe.seen.lock().unwrap(),
+            [true],
+            "wake exactly once, after the state lock is released"
+        );
+        let mut cx = Context::from_waker(Waker::noop());
+        assert_eq!(Pin::new(&mut rx).poll(&mut cx), Poll::Ready(5));
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. The waker checks whether `state` is free. It is woken once while the
+        // lock is held, and once after the guard is dropped.
+        let state = Arc::new(Mutex::new(0u8));
+        let probe = Arc::new(Probe {
+            lock: Arc::clone(&state),
+            seen: Mutex::new(Vec::new()),
+        });
+        let waker = Waker::from(Arc::clone(&probe));
+        {
+            let _guard = state.lock().unwrap();
+            waker.wake_by_ref();
+        }
+        waker.wake_by_ref();
+        let p1: Vec<bool> = guess();
+        assert_eq!(p1, *probe.seen.lock().unwrap(), "P1: waking under a lock");
+
+        // P2. A slot holds a clone of waker `wa`. Strong count of `a` before and
+        // after the slot's waker is replaced by a clone of `wb`.
+        let (a, wa) = counted();
+        let (_b, wb) = counted();
+        let mut slot = Some(wa.clone());
+        let before = Arc::strong_count(&a);
+        slot.replace(wb.clone());
+        let after = Arc::strong_count(&a);
+        let p2: (usize, usize) = guess();
+        assert_eq!(
+            p2,
+            (before, after),
+            "P2: replacing a stored waker drops the old one"
+        );
+        drop(slot);
     }
 }
