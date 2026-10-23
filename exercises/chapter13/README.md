@@ -2,43 +2,50 @@
 
 [All chapters](../../README.md) · [Previous chapter](../chapter12/README.md) · [Next chapter](../chapter14/README.md)
 
-Original guided exercises for [*Programming Rust*, 3rd edition, chapter 13](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch13.html).
-Read the corresponding book sections alongside these exercises. These are new problems, not reproductions of the book’s examples.
-
-This chapter has **8 lessons, 22 implementation tasks, and 22 automated checks**, plus prediction, compiler/manual, explanation, and transfer work.
-The starter functions intentionally contain `todo!()`: they compile, and tests fail until you implement the contracts. Keep the supplied tests intact. Type signatures/trait scaffolds are provided so each lesson compiles independently; reconstruct their bounds in the compiler labs to practice design rather than only filling method bodies.
+Original guided exercises for [*Programming Rust*, 3rd edition, chapter 13](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch13.html). Read the corresponding section before each lesson. These exercises use original scenarios and contracts. Type signatures and trait scaffolds are provided so each lesson compiles; the compiler labs ask you to rebuild their bounds yourself.
 
 ## Work through the chapter
 
-For each lesson: predict before running; implement one task; run its filter; complete the lab in [the scratch example](../../examples/ch13_scratch.rs); explain the ownership/trait/API choices; add a transfer case.
-Read [Hint 1 before Hint 2](HINTS.md) only if stuck. Passing tests alone does not demonstrate mastery.
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
 
-| Done | Lesson | Check |
-| --- | --- | --- |
-| [ ] | [01 · Destruction and resource lifetimes](l01_drop.rs) | `cargo test --test chapter13 l01_` |
-| [ ] | [02 · Sized, Clone, and Copy](l02_sized_clone.rs) | `cargo test --test chapter13 l02_` |
-| [ ] | [03 · Deref, DerefMut, and Default](l03_deref_default.rs) | `cargo test --test chapter13 l03_` |
-| [ ] | [04 · AsRef and AsMut views](l04_views.rs) | `cargo test --test chapter13 l04_` |
-| [ ] | [05 · Borrow and borrowed lookup](l05_borrow.rs) | `cargo test --test chapter13 l05_` |
-| [ ] | [06 · Infallible and fallible conversions](l06_conversions.rs) | `cargo test --test chapter13 l06_` |
-| [ ] | [07 · ToOwned and clone-on-write](l07_cow.rs) | `cargo test --test chapter13 l07_` |
-| [ ] | [08 · Capstone: validated names with cheap views](l08_capstone.rs) | `cargo test --test chapter13 l08_` |
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter13 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests count heap allocations or compare pointers, so a solution that copies where it could borrow fails. Then run `cargo clippy --test chapter13` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch13` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), add one edge-case test, then compare with *Check your explanation* in [HINTS.md](HINTS.md).
 
-Run commands from the repository root:
+After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
+
+| Done | Lesson |
+| --- | --- |
+| [ ] | [01 · Destruction and resource lifetimes](l01_drop.rs) |
+| [ ] | [02 · Sized, Clone, and Copy](l02_sized_clone.rs) |
+| [ ] | [03 · Deref, DerefMut, and Default](l03_deref_default.rs) |
+| [ ] | [04 · AsRef and AsMut views](l04_views.rs) |
+| [ ] | [05 · Borrow and borrowed lookup](l05_borrow.rs) |
+| [ ] | [06 · Infallible and fallible conversions](l06_conversions.rs) |
+| [ ] | [07 · ToOwned and clone-on-write](l07_cow.rs) |
+| [ ] | [08 · Capstone: validated names with cheap views](l08_capstone.rs) |
+| [ ] | [R01 · Review: Chapters 9, 11, and 12 from memory](r01_review.rs) |
+| [ ] | [C01 · Code review: a teammate's pull request](c01_code_review.rs) |
+| [ ] | [Compiler drills](../../drills/ch13/) — `cargo drill ch13` |
 
 ```sh
-cargo test --test chapter13 --no-run
+cargo test --test chapter13 l01_
 cargo test --test chapter13 -- --list
-cargo run --example ch13_scratch
 cargo test --test chapter13
 cargo test --release --test chapter13
+cargo clippy --test chapter13
+cargo drill ch13
+cargo run --example ch13_scratch
 ```
 
-Some labs deliberately fail to compile or panic. Keep them in scratch and restore a compiling example afterward. Do not put intentional compilation failures in the test modules. Tests are deterministic and require only the standard library; any separate dependency lab is described below.
+The starters compile; tests fail intentionally at `todo!()` and `guess()` until you fill them in. Keep the supplied tests intact. Every runnable task uses the standard library and needs no network. Each lesson's compiler lab belongs in [the scratch example](../../examples/ch13_scratch.rs); some labs deliberately fail to compile or panic, so restore it to compiling code afterward. Never put intentional compilation failures in the test modules.
+
+Use [progressive hints](HINTS.md) only after a first attempt.
 
 ## Coverage against the chapter
-
-Every main topic is assigned to a coded lesson or concrete manual/compiler lab. A lesson reference includes its prompts and lab as well as its tests.
 
 | Book topic | Practice |
 | --- | --- |

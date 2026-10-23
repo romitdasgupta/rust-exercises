@@ -1,8 +1,8 @@
 //! LESSON 08 — Capstone: validated names with cheap views
 //! Run: cargo test --test chapter13 l08_
 //!
-//! PREDICT before executing: Plan which operations borrow, which consume, and which
-//! allocate. Should a blank name have a Default implementation?
+//! PREDICT before running: Plan which operations borrow, which consume, and which allocate.
+//! Should a blank name have a Default implementation?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Which utility traits would be misleading for this type? Why does
@@ -38,6 +38,8 @@ fn annotated<'a>(name: &'a Name, tag: &str) -> Cow<'a, str> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::alloc::count;
+    use std::hint::black_box;
     #[test]
     fn a_validation_trims_and_rejects_blank() {
         assert_eq!(Name::try_from(" \u{2003}"), Err("blank name"));
@@ -57,5 +59,33 @@ mod tests {
         assert!(matches!(annotated(&name, ""), Cow::Borrowed(_)));
         assert_eq!(annotated(&name, "staff"), "Ada [staff]");
         assert!(matches!(annotated(&name, "x"), Cow::Owned(_)));
+    }
+
+    #[test]
+    fn a_validation_keeps_interior_whitespace() {
+        assert_eq!(
+            Name::try_from("\tAda Lovelace\n"),
+            Ok(Name("Ada Lovelace".into()))
+        );
+        assert_eq!(Name::try_from(""), Err("blank name"));
+    }
+
+    #[test]
+    fn a_validation_allocates_only_the_final_name() {
+        let (name, allocations) = count(|| Name::try_from(black_box("   Grace   ")));
+        assert_eq!(name, Ok(Name("Grace".into())));
+        assert!(
+            allocations <= 1,
+            "trim the borrowed input, then own it once; got {allocations}"
+        );
+    }
+
+    #[test]
+    fn b_c_views_borrow_the_stored_text() {
+        let name = Name("Ada".into());
+        assert_eq!(name.as_ref().as_ptr(), name.0.as_ptr());
+        let (view, allocations) = count(|| annotated(&name, ""));
+        assert_eq!(allocations, 0, "an empty tag needs no new text");
+        assert_eq!(view.as_ptr(), name.0.as_ptr());
     }
 }

@@ -1,8 +1,9 @@
 //! LESSON 02 — Sized, Clone, and Copy
 //! Run: cargo test --test chapter13 l02_
 //!
-//! PREDICT before executing: Is str Sized? Is &str Sized? Does cloning Rc<Vec<_>> clone its
-//! elements?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: Is str Sized? Is &str Sized? Does cloning
+//! Rc<Vec<_>> clone its elements?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Why is Copy a promise about implicit duplication rather than a
@@ -39,6 +40,8 @@ fn copied_edit(point: Coordinates) -> (Coordinates, Coordinates) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
+    use std::hint::black_box;
     #[test]
     fn a_unsized_referents_are_accepted() {
         assert_eq!(borrowed_size("é"), 2);
@@ -56,5 +59,43 @@ mod tests {
     fn c_copy_keeps_original_available() {
         let p = Coordinates { x: 2, y: 3 };
         assert_eq!(copied_edit(p), (p, Coordinates { x: 99, y: 3 }));
+    }
+
+    #[test]
+    fn a_sized_referents_work_too() {
+        assert_eq!(borrowed_size(&5_u64), 8);
+        assert_eq!(borrowed_size(&[0_u16; 3]), 6);
+    }
+
+    #[test]
+    fn b_only_the_first_element_changes() {
+        let source: Vec<String> = vec!["x".into(), "y".into(), "z".into()];
+        assert_eq!(cloned_edit(&source, "🦀"), ["x🦀", "y", "z"]);
+        assert_eq!(cloned_edit(&source, ""), source);
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Sizes, in machine words, of a reference to an unsized and a sized referent.
+        let p1: (usize, usize) = guess();
+        assert_eq!(
+            (p1.0 * size_of::<usize>(), p1.1 * size_of::<usize>()),
+            (size_of::<&str>(), size_of::<&[u8; 4]>()),
+            "P1: fat and thin references"
+        );
+
+        // P2. clone_from into a String that already has room. Heap allocations?
+        let source = String::from("short");
+        let mut target = String::with_capacity(32);
+        let before = target.as_ptr();
+        let (_, allocations) = count(|| target.clone_from(black_box(&source)));
+        let p2: (usize, bool) = guess();
+        assert_eq!(
+            p2,
+            (allocations, target.as_ptr() == before),
+            "P2: clone_from can reuse the target's buffer"
+        );
+        assert_eq!(target, "short");
     }
 }
