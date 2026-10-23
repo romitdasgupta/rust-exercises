@@ -1,8 +1,9 @@
 //! LESSON 03 — Partial and total comparisons
 //! Run: cargo test --test chapter12 l03_
 //!
-//! PREDICT before executing: If cmp returns Equal, what must equality report? What does
-//! partial_cmp return for NaN?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: If cmp returns Equal, what must equality
+//! report? What does partial_cmp return for NaN?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Why is lexicographic tie-breaking part of the public contract? Why
@@ -41,6 +42,7 @@ fn compare_readings(a: f64, b: f64) -> Option<Ordering> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
     #[test]
     fn a_total_order_respects_primary_and_secondary_keys() {
         let mut jobs = vec![
@@ -83,5 +85,76 @@ mod tests {
         assert_eq!(compare_readings(f64::NAN, 1.0), None);
         assert_eq!(compare_readings(-0.0, 0.0), Some(Ordering::Equal));
         assert_eq!(compare_readings(-1.0, 2.0), Some(Ordering::Less));
+    }
+
+    #[test]
+    fn a_priority_wins_over_name() {
+        let low = Job {
+            priority: 1,
+            name: "zzz".into(),
+        };
+        let high = Job {
+            priority: 9,
+            name: "a".into(),
+        };
+        assert_eq!(low.cmp(&high), Ordering::Less);
+        assert_eq!(high.cmp(&low), Ordering::Greater);
+        assert!(low < high, "the < operator goes through PartialOrd");
+    }
+
+    #[test]
+    fn c_float_order_handles_nan_on_either_side() {
+        assert_eq!(compare_readings(1.0, f64::NAN), None);
+        assert_eq!(compare_readings(f64::NAN, f64::NAN), None);
+        assert_eq!(compare_readings(2.0, -1.0), Some(Ordering::Greater));
+        assert_eq!(
+            compare_readings(f64::NEG_INFINITY, f64::MIN),
+            Some(Ordering::Less)
+        );
+    }
+
+    #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+    enum Level {
+        High,
+        Low,
+        Medium,
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Partial vs total comparison of the two zeros.
+        let p1: (Option<Ordering>, Ordering) = guess();
+        assert_eq!(
+            p1,
+            ((-0.0_f64).partial_cmp(&0.0), (-0.0_f64).total_cmp(&0.0)),
+            "P1: partial_cmp vs total_cmp"
+        );
+
+        // P2. Derived Ord on an enum, after sorting.
+        let mut levels = [Level::Low, Level::High, Level::Medium];
+        levels.sort();
+        let p2: [Level; 3] = guess();
+        assert_eq!(p2, levels, "P2: derived enum order");
+
+        // P3. str comparison.
+        let p3: (bool, bool, bool) = guess();
+        assert_eq!(
+            p3,
+            ("Zebra" < "apple", "10" < "9", "apple" < "Apple"),
+            "P3: strings compare bytes"
+        );
+
+        // P4. Ties: which element do max_by_key and min_by_key return?
+        let pairs = [(1, 'a'), (1, 'b')];
+        let p4: (char, char) = guess();
+        assert_eq!(
+            p4,
+            (
+                pairs.iter().max_by_key(|p| p.0).unwrap().1,
+                pairs.iter().min_by_key(|p| p.0).unwrap().1
+            ),
+            "P4: tie-breaking in max and min"
+        );
     }
 }

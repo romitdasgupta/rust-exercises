@@ -1,8 +1,9 @@
 //! LESSON 05 — Borrow and borrowed lookup
 //! Run: cargo test --test chapter13 l05_
 //!
-//! PREDICT before executing: Why can HashMap<String,_> be queried by &str? Would a
-//! case-insensitive key be allowed to Borrow<str> with normal str equality?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: Why can HashMap<String,_> be queried by
+//! &str? Would a case-insensitive key be allowed to Borrow<str> with normal str equality?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Explain the stronger equality/order/hash contract of Borrow compared
@@ -34,6 +35,9 @@ fn append_owned<B: BorrowMut<String>>(value: &mut B, suffix: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
+    use std::collections::HashSet;
+    use std::hash::{DefaultHasher, Hash, Hasher};
     #[test]
     fn a_lookup_uses_borrowed_identity() {
         let map = HashMap::from([("é".into(), 7)]);
@@ -50,5 +54,53 @@ mod tests {
         let mut s = String::from("a");
         append_owned(&mut s, "β");
         assert_eq!(s, "aβ");
+    }
+
+    #[test]
+    fn a_lookup_does_not_build_an_owned_key() {
+        let map = HashMap::from([("alpha".to_string(), 1), ("beta".to_string(), 2)]);
+        let (found, allocations) = count(|| lookup(&map, "beta"));
+        assert_eq!(found, Some(2));
+        assert_eq!(
+            allocations, 0,
+            "query with &str; do not allocate a String key"
+        );
+    }
+
+    #[test]
+    fn c_any_owner_of_a_string_can_be_edited() {
+        let mut boxed = Box::new(String::from("x"));
+        append_owned(&mut boxed, "y");
+        assert_eq!(*boxed, "xy");
+        let mut empty = String::new();
+        append_owned(&mut empty, "");
+        assert_eq!(empty, "");
+    }
+
+    fn hash_of<T: Hash + ?Sized>(value: &T) -> u64 {
+        let mut h = DefaultHasher::new();
+        value.hash(&mut h);
+        h.finish()
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Borrow requires that a String and its &str hash the same.
+        let p1: bool = guess();
+        assert_eq!(
+            p1,
+            hash_of(&String::from("key")) == hash_of("key"),
+            "P1: Borrow<str> for String"
+        );
+
+        // P2. Vec<i32> implements Borrow<[i32]>. Lookups by slice:
+        let set: HashSet<Vec<i32>> = HashSet::from([vec![1, 2]]);
+        let p2: (bool, bool) = guess();
+        assert_eq!(
+            p2,
+            (set.contains(&[1, 2][..]), set.contains(&[2, 1][..])),
+            "P2: borrowed slice lookup"
+        );
     }
 }

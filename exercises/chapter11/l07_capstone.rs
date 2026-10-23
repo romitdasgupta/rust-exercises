@@ -1,9 +1,8 @@
 //! LESSON 07 — Capstone: a generic validation pipeline
 //! Run: cargo test --test chapter11 l07_
 //!
-//! PREDICT before executing: Design which values are borrowed, owned, statically
-//! dispatched, and dynamically dispatched before coding. Predict empty-source and
-//! empty-rule behavior.
+//! PREDICT before running: Design which values are borrowed, owned, statically dispatched,
+//! and dynamically dispatched before coding. Predict empty-source and empty-rule behavior.
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Why can rules be heterogeneous while the Source associated type stays
@@ -50,6 +49,7 @@ fn run<S: Source<Item = String>>(source: &mut S, rules: &[&dyn Rule]) -> (Vec<St
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::alloc::count;
     struct Input(std::vec::IntoIter<String>);
     impl Source for Input {
         type Item = String;
@@ -92,5 +92,32 @@ mod tests {
         );
         assert_eq!(run(&mut s, &[]), (vec![], 0));
         assert_eq!(run(&mut input(&[""]), &[]), (vec!["".into()], 0));
+    }
+
+    #[test]
+    fn c_pipeline_moves_strings_instead_of_copying_them() {
+        let words: Vec<String> = (0..200).map(|i| format!("word{i}")).collect();
+        let first = words[0].as_ptr();
+        let mut s = Input(words.into_iter());
+        let min = MinLength(1);
+        let ((kept, rejected), allocations) = count(|| run(&mut s, &[&min]));
+        assert_eq!((kept.len(), rejected), (200, 0));
+        assert_eq!(kept[0].as_ptr(), first, "accepted strings should be moved");
+        assert!(
+            allocations <= 12,
+            "200 accepted strings cost {allocations} allocations"
+        );
+    }
+
+    #[test]
+    fn b_collect_source_moves_strings() {
+        let words: Vec<String> = (0..200).map(|i| format!("w{i}")).collect();
+        let mut s = Input(words.into_iter());
+        let (all, allocations) = count(|| collect_source(&mut s));
+        assert_eq!(all.len(), 200);
+        assert!(
+            allocations <= 12,
+            "200 strings cost {allocations} allocations"
+        );
     }
 }

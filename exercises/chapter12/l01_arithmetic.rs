@@ -1,8 +1,9 @@
 //! LESSON 01 — Unary, binary, and assignment operators
 //! Run: cargo test --test chapter12 l01_
 //!
-//! PREDICT before executing: Does a+b necessarily return the same type as a? Does a+=b have
-//! an Output associated type?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: Does a+b necessarily return the same type as
+//! a? Does a+=b have an Output associated type?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Why are assignment traits separate? What are the move semantics of
@@ -52,6 +53,8 @@ impl Mul<i32> for Delta {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
+    use std::hint::black_box;
     #[test]
     fn a_addition_is_componentwise() {
         assert_eq!(
@@ -74,5 +77,47 @@ mod tests {
     fn d_rhs_can_be_another_type() {
         assert_eq!(Delta { x: 3, y: -2 } * 4, Delta { x: 12, y: -8 });
         assert_eq!(Delta { x: 1, y: 2 } * 0, Delta { x: 0, y: 0 });
+    }
+
+    #[test]
+    fn b_negation_flips_both_coordinates() {
+        assert_eq!(-Delta { x: 5, y: -7 }, Delta { x: -5, y: 7 });
+        assert_eq!(-Delta { x: 0, y: 0 }, Delta { x: 0, y: 0 });
+    }
+
+    #[test]
+    fn d_negative_scale_flips_signs() {
+        assert_eq!(Delta { x: -1, y: 2 } * -3, Delta { x: 3, y: -6 });
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    /// A wrong prediction is useful: read the failure, then explain it in NOTES.md.
+    #[test]
+    fn p_predictions() {
+        // P1. `String + &str` takes the left String by value. Does the result reuse
+        // its heap buffer?
+        let mut s = String::with_capacity(16);
+        s.push_str("ab");
+        let before = s.as_ptr();
+        let joined = s + "cd";
+        let p1: bool = guess();
+        assert_eq!(p1, joined.as_ptr() == before, "P1: Add for String");
+        assert_eq!(joined, "abcd");
+
+        // P2. `!` is `Not`: logical for bool, bitwise for integers.
+        let p2: (u8, i8, bool) = guess();
+        assert_eq!(p2, (!0u8, !5i8, !true), "P2: one operator, three types");
+
+        // P3. Heap allocations made by `+=` on a String with room to spare.
+        let (text, allocations) = count(|| {
+            let mut s = String::with_capacity(8);
+            for _ in 0..4 {
+                s += black_box("ab");
+            }
+            black_box(s)
+        });
+        let p3: usize = guess();
+        assert_eq!(p3, allocations, "P3: AddAssign mutates in place");
+        assert_eq!(text, "abababab");
     }
 }
