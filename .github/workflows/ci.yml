@@ -30,6 +30,8 @@ jobs:
           cargo fmt --manifest-path exercises/chapter22/export_lab/Cargo.toml --all --check
       - name: Lint
         run: cargo clippy --locked --offline --all-targets --all-features
+      - name: Test the support library and the coach
+        run: cargo test --locked --offline --lib --example coach
       # Unfinished exercises intentionally panic. Compile their tests without running them.
       - name: Compile core starters and playground in both profiles
         run: |

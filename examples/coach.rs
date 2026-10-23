@@ -105,9 +105,8 @@ fn judge(expect: &str, actual: &Outcome) -> Verdict {
             let mut predicted = predicted_codes.clone();
             predicted.sort();
             predicted.dedup();
-            if !predicted.is_empty() && predicted == actual_codes {
-                Verdict::Right
-            } else if words == ["error"] && actual_codes.is_empty() {
+            let exact = !predicted.is_empty() && predicted == actual_codes;
+            if exact || (words == ["error"] && actual_codes.is_empty()) {
                 Verdict::Right
             } else if words == ["error"] || predicted.iter().any(|code| actual_codes.contains(code))
             {
@@ -196,14 +195,11 @@ fn compile_and_run(path: &Path) -> Result<Run, String> {
         .map_err(|e| format!("could not start rustc: {e}"))?;
     let diagnostics = String::from_utf8_lossy(&compiled.stderr).into_owned();
     if !compiled.status.success() {
-        let mut codes = Vec::new();
-        for line in strip_ansi(&diagnostics).lines() {
-            if let Some(rest) = line.strip_prefix("error[") {
-                if let Some(code) = rest.split(']').next() {
-                    codes.push(code.to_string());
-                }
-            }
-        }
+        let codes = strip_ansi(&diagnostics)
+            .lines()
+            .filter_map(|line| line.strip_prefix("error[")?.split(']').next())
+            .map(str::to_string)
+            .collect();
         return Ok(Run {
             outcome: Outcome::Errors(codes),
             output: diagnostics,
@@ -544,10 +540,32 @@ fn progress() -> Result<(), String> {
     let mut next: Option<String> = None;
     println!("Lessons: ✓ all tests pass · ◐ started · · not started\n");
     for chapter in 3..=24 {
-        let lessons = chapter_status(chapter)?;
+        let lessons = match chapter_status(chapter) {
+            Ok(lessons) => lessons,
+            Err(_) => {
+                println!(
+                    "ch{chapter:02}  does not compile: run `cargo test --test chapter{chapter:02}` to see why"
+                );
+                if next.is_none() {
+                    next = Some(format!("cargo test --test chapter{chapter:02}"));
+                }
+                continue;
+            }
+        };
         let mut line = String::new();
         let mut done = 0;
-        for (module, lesson) in &lessons {
+        // Numbered lessons first, then the review and code-review lessons.
+        let mut ordered: Vec<(&String, &Lesson)> = lessons.iter().collect();
+        ordered.sort_by_key(|(module, _)| {
+            let rank = match module.as_bytes().first() {
+                Some(b'l') => 0,
+                Some(b'r') => 1,
+                Some(b'c') => 2,
+                _ => 3,
+            };
+            (rank, module.as_str())
+        });
+        for (module, lesson) in ordered {
             let short = module.split('_').next().unwrap_or(module);
             let mark = if lesson.failed == 0 {
                 done += 1;
@@ -675,5 +693,57 @@ fn chapter_number(text: &str) -> Result<u32, String> {
     match digits.parse() {
         Ok(n @ 3..=24) => Ok(n),
         _ => Err(format!("expected a chapter like ch04, got {text}\n{USAGE}")),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn errors(codes: &[&str]) -> Outcome {
+        Outcome::Errors(codes.iter().map(|c| c.to_string()).collect())
+    }
+
+    #[test]
+    fn judge_compares_predictions_with_outcomes() {
+        assert!(judge("ok", &Outcome::Ok) == Verdict::Right);
+        assert!(judge("OK", &Outcome::Panic) == Verdict::Wrong);
+        assert!(judge("panic", &Outcome::Panic) == Verdict::Right);
+        assert!(judge("E0382", &errors(&["E0382", "E0382"])) == Verdict::Right);
+        assert!(judge("e0382, E0499", &errors(&["E0499", "E0382"])) == Verdict::Right);
+        assert!(judge("E0382", &errors(&["E0382", "E0499"])) == Verdict::Partial);
+        assert!(judge("error", &errors(&["E0382"])) == Verdict::Partial);
+        assert!(judge("error", &errors(&[])) == Verdict::Right);
+        assert!(judge("E0505", &errors(&["E0382"])) == Verdict::Wrong);
+        assert!(judge("ok", &errors(&["E0382"])) == Verdict::Wrong);
+    }
+
+    #[test]
+    fn expect_line_ignores_placeholders() {
+        assert_eq!(expect_line("//! EXPECT: ?\nfn main() {}"), None);
+        assert_eq!(expect_line("//! EXPECT:\n"), None);
+        assert_eq!(expect_line("//! EXPECT: E0382\n").as_deref(), Some("E0382"));
+        assert_eq!(expect_line("// EXPECT: ok\n").as_deref(), Some("ok"));
+    }
+
+    #[test]
+    fn keep_lines_and_ansi() {
+        let src = "let a = 1;\n    assert!(a == 1); // KEEP\n";
+        assert_eq!(keep_lines(src), ["assert!(a == 1); // KEEP"]);
+        assert_eq!(
+            strip_ansi("\u{1b}[1m\u{1b}[38;5;9merror[E0382]\u{1b}[0m: x"),
+            "error[E0382]: x"
+        );
+    }
+
+    #[test]
+    fn dates_and_chapters() {
+        assert_eq!(date(0), "1970-01-01");
+        assert_eq!(date(20_384), "2025-10-23");
+        assert_eq!(date(11_016), "2000-02-29");
+        assert_eq!(chapter_number("ch04"), Ok(4));
+        assert_eq!(chapter_number("chapter24"), Ok(24));
+        assert!(chapter_number("ch2").is_err());
+        assert!(chapter_number("ch25").is_err());
     }
 }
