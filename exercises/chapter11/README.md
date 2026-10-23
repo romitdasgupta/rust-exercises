@@ -2,42 +2,49 @@
 
 [All chapters](../../README.md) · [Previous chapter](../chapter10/README.md) · [Next chapter](../chapter12/README.md)
 
-Original guided exercises for [*Programming Rust*, 3rd edition, chapter 11](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch11.html).
-Read the corresponding book sections alongside these exercises. These are new problems, not reproductions of the book’s examples.
-
-This chapter has **7 lessons, 19 implementation tasks, and 19 automated checks**, plus prediction, compiler/manual, explanation, and transfer work.
-The starter functions intentionally contain `todo!()`: they compile, and tests fail until you implement the contracts. Keep the supplied tests intact. Type signatures/trait scaffolds are provided so each lesson compiles independently; reconstruct their bounds in the compiler labs to practice design rather than only filling method bodies.
+Original guided exercises for [*Programming Rust*, 3rd edition, chapter 11](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch11.html). Read the corresponding section before each lesson. These exercises use original scenarios and contracts. Type signatures and trait scaffolds are provided so each lesson compiles; the compiler labs ask you to rebuild their bounds yourself.
 
 ## Work through the chapter
 
-For each lesson: predict before running; implement one task; run its filter; complete the lab in [the scratch example](../../examples/ch11_scratch.rs); explain the ownership/trait/API choices; add a transfer case.
-Read [Hint 1 before Hint 2](HINTS.md) only if stuck. Passing tests alone does not demonstrate mastery.
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
 
-| Done | Lesson | Check |
-| --- | --- | --- |
-| [ ] | [01 · Traits, implementations, and defaults](l01_interfaces.rs) | `cargo test --test chapter11 l01_` |
-| [ ] | [02 · Static and dynamic dispatch](l02_dispatch.rs) | `cargo test --test chapter11 l02_` |
-| [ ] | [03 · Self, supertraits, and associated items](l03_self.rs) | `cargo test --test chapter11 l03_` |
-| [ ] | [04 · Extension traits and qualified calls](l04_extensions.rs) | `cargo test --test chapter11 l04_` |
-| [ ] | [05 · Associated types and generic traits](l05_relationships.rs) | `cargo test --test chapter11 l05_` |
-| [ ] | [06 · Opaque results, lifetimes, and precise capture](l06_bounds.rs) | `cargo test --test chapter11 l06_` |
-| [ ] | [07 · Capstone: a generic validation pipeline](l07_capstone.rs) | `cargo test --test chapter11 l07_` |
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter11 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests count heap allocations or compare pointers, so a solution that copies where it could borrow fails. Then run `cargo clippy --test chapter11` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch11` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), add one edge-case test, then compare with *Check your explanation* in [HINTS.md](HINTS.md).
 
-Run commands from the repository root:
+After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
+
+| Done | Lesson |
+| --- | --- |
+| [ ] | [01 · Traits, implementations, and defaults](l01_interfaces.rs) |
+| [ ] | [02 · Static and dynamic dispatch](l02_dispatch.rs) |
+| [ ] | [03 · Self, supertraits, and associated items](l03_self.rs) |
+| [ ] | [04 · Extension traits and qualified calls](l04_extensions.rs) |
+| [ ] | [05 · Associated types and generic traits](l05_relationships.rs) |
+| [ ] | [06 · Opaque results, lifetimes, and precise capture](l06_bounds.rs) |
+| [ ] | [07 · Capstone: a generic validation pipeline](l07_capstone.rs) |
+| [ ] | [R01 · Review: Chapters 7, 9, and 10 from memory](r01_review.rs) |
+| [ ] | [C01 · Code review: a teammate's pull request](c01_code_review.rs) |
+| [ ] | [Compiler drills](../../drills/ch11/) — `cargo drill ch11` |
 
 ```sh
-cargo test --test chapter11 --no-run
+cargo test --test chapter11 l01_
 cargo test --test chapter11 -- --list
-cargo run --example ch11_scratch
 cargo test --test chapter11
 cargo test --release --test chapter11
+cargo clippy --test chapter11
+cargo drill ch11
+cargo run --example ch11_scratch
 ```
 
-Some labs deliberately fail to compile or panic. Keep them in scratch and restore a compiling example afterward. Do not put intentional compilation failures in the test modules. Tests are deterministic and require only the standard library; any separate dependency lab is described below.
+The starters compile; tests fail intentionally at `todo!()` and `guess()` until you fill them in. Keep the supplied tests intact. Every runnable task uses the standard library and needs no network. Each lesson's compiler lab belongs in [the scratch example](../../examples/ch11_scratch.rs); some labs deliberately fail to compile or panic, so restore it to compiling code afterward. Never put intentional compilation failures in the test modules.
+
+Use [progressive hints](HINTS.md) only after a first attempt.
 
 ## Coverage against the chapter
-
-Every main topic is assigned to a coded lesson or concrete manual/compiler lab. A lesson reference includes its prompts and lab as well as its tests.
 
 | Book topic | Practice |
 | --- | --- |
