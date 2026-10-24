@@ -1,7 +1,7 @@
 //! LESSON 05 — Capstone: a small bit-set API
 //! Run: cargo test --test chapter12 l05_
 //!
-//! PREDICT before executing: Predict the results of union, intersection, and complement on
+//! PREDICT before running: Predict the results of union, intersection, and complement on
 //! 8-bit masks. Does complement require knowing a collection length?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
@@ -21,23 +21,27 @@ use std::ops::{BitAnd, BitOr, BitOrAssign, Not};
 struct Flags(u8);
 impl BitOr for Flags {
     type Output = Self;
+    /// A. Union: a bit is set when it is set in either operand.
     fn bitor(self, rhs: Self) -> Self {
         todo!("Task 1: implement the documented contract")
     }
 }
 impl BitAnd for Flags {
     type Output = Self;
+    /// B. Intersection: a bit is set when it is set in both operands.
     fn bitand(self, rhs: Self) -> Self {
         todo!("Task 2: implement the documented contract")
     }
 }
 impl Not for Flags {
     type Output = Self;
+    /// C. Complement: flip all 8 bits.
     fn not(self) -> Self {
         todo!("Task 3: implement the documented contract")
     }
 }
 impl BitOrAssign for Flags {
+    /// D. Union in place: add rhs's bits to self.
     fn bitor_assign(&mut self, rhs: Self) {
         todo!("Task 4: implement the documented contract")
     }
@@ -65,6 +69,7 @@ mod tests {
     fn c_complement_is_eight_bits_wide() {
         assert_eq!(!Flags(0), Flags(255));
         assert_eq!(!!Flags(19), Flags(19));
+        assert_eq!(!Flags(0b1010_0101), Flags(0b0101_1010));
     }
     #[test]
     fn d_assignment_updates_the_receiver() {

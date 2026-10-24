@@ -1,0 +1,3 @@
+2026-10-23T17:05:00Z INFO upload user=ada file=report.pdf
+2026-10-23T17:05:01Z INFO upload user=ada file=café.txt
+2026-10-23T17:05:02Z ERROR upload user=ada msg="quota exceeded"

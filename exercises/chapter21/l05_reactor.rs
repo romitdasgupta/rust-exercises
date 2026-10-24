@@ -1,7 +1,8 @@
 //! LESSON 05 — Readiness registration model
 //! Run: cargo test --test chapter21 l05_
 //!
-//! PREDICT before running:
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider:
 //! 1. Can readiness become stale before the actual I/O attempt?
 //! 2. Does readiness mean a whole application message is available?
 //!
@@ -38,10 +39,10 @@ fn signal(event: &Arc<Mutex<Event>>) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::{
-        Arc,
-        atomic::{AtomicUsize, Ordering},
-    };
+    use practice::guess;
+    use std::io::{ErrorKind, Read};
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::task::Wake;
     struct Counter(AtomicUsize);
     impl std::task::Wake for Counter {
         fn wake(self: Arc<Self>) {
@@ -57,7 +58,7 @@ mod tests {
         (c, w)
     }
     #[test]
-    fn readiness_wakes_registered_task() {
+    fn a_b_readiness_wakes_registered_task() {
         let event = Arc::new(Mutex::new(Event::default()));
         let mut f = Readiness(Arc::clone(&event));
         let (c, w) = counted();
@@ -70,8 +71,9 @@ mod tests {
         assert_eq!(c.0.load(Ordering::Relaxed), 1);
     }
     #[test]
-    fn early_readiness_is_remembered() {
+    fn a_b_early_readiness_is_remembered() {
         let event = Arc::new(Mutex::new(Event::default()));
+        signal(&event);
         signal(&event);
         let mut f = Readiness(event);
         assert!(
@@ -79,5 +81,90 @@ mod tests {
                 .poll(&mut Context::from_waker(Waker::noop()))
                 .is_ready()
         );
+    }
+    #[test]
+    fn a_ready_flag_is_not_cleared_by_polling() {
+        let event = Arc::new(Mutex::new(Event {
+            ready: true,
+            waiter: None,
+        }));
+        let mut f = Readiness(Arc::clone(&event));
+        let mut cx = Context::from_waker(Waker::noop());
+        assert!(Pin::new(&mut f).poll(&mut cx).is_ready());
+        assert!(event.lock().unwrap().ready);
+        assert!(Pin::new(&mut f).poll(&mut cx).is_ready());
+    }
+    #[test]
+    fn a_b_latest_waker_replaces_the_old_one() {
+        let event = Arc::new(Mutex::new(Event::default()));
+        let mut f = Readiness(Arc::clone(&event));
+        let (a, wa) = counted();
+        let (b, wb) = counted();
+        assert!(
+            Pin::new(&mut f)
+                .poll(&mut Context::from_waker(&wa))
+                .is_pending()
+        );
+        assert!(
+            Pin::new(&mut f)
+                .poll(&mut Context::from_waker(&wb))
+                .is_pending()
+        );
+        signal(&event);
+        assert_eq!(
+            (a.0.load(Ordering::Relaxed), b.0.load(Ordering::Relaxed)),
+            (0, 1)
+        );
+        assert_eq!(
+            Arc::strong_count(&a),
+            2,
+            "the replaced waker must be dropped"
+        );
+    }
+    #[test]
+    fn b_wake_happens_after_unlocking() {
+        struct Probe(Arc<Mutex<Event>>, Mutex<Vec<bool>>);
+        impl Wake for Probe {
+            fn wake(self: Arc<Self>) {
+                self.wake_by_ref();
+            }
+            fn wake_by_ref(self: &Arc<Self>) {
+                let free = self.0.try_lock().is_ok();
+                self.1.lock().unwrap().push(free);
+            }
+        }
+        let event = Arc::new(Mutex::new(Event::default()));
+        let probe = Arc::new(Probe(Arc::clone(&event), Mutex::new(Vec::new())));
+        let waker = Waker::from(Arc::clone(&probe));
+        let mut f = Readiness(Arc::clone(&event));
+        assert!(
+            Pin::new(&mut f)
+                .poll(&mut Context::from_waker(&waker))
+                .is_pending()
+        );
+        signal(&event);
+        assert_eq!(
+            *probe.1.lock().unwrap(),
+            [true],
+            "take the waiter under the lock, wake after unlocking"
+        );
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Only 2 bytes have arrived. A 3-byte read, then read_exact of 3 bytes.
+        let mut arrived: &[u8] = &[1, 2];
+        let mut buf = [0u8; 3];
+        let n = arrived.read(&mut buf).unwrap();
+        let mut again: &[u8] = &[1, 2];
+        let kind = again.read_exact(&mut buf).unwrap_err().kind();
+        let p1: (usize, ErrorKind) = guess();
+        assert_eq!(p1, (n, kind), "P1: readiness is not a whole message");
+
+        // P2. Reading from a source with no bytes left: error or value?
+        let mut empty: &[u8] = &[];
+        let p2: usize = guess();
+        assert_eq!(p2, empty.read(&mut buf).unwrap(), "P2: how EOF is reported");
     }
 }

@@ -1,0 +1,13 @@
+[package]
+license = "MIT"
+name = "loglens"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+description = "A structured-log analyzer built milestone by milestone alongside Programming Rust"
+publish = false
+
+# A standalone package: not a member of the exercise repository's root package.
+[workspace]
+
+[dependencies]

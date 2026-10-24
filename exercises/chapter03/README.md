@@ -5,30 +5,20 @@
 Original exercises accompanying [Chapter 3 of *Programming Rust*, 3rd edition](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch03.html).
 The book is your reference; these exercises are a place to practice and explain its ideas.
 
-## Start here
+## Work through the chapter
 
-Open [lesson 1](l01_inference.rs). Read its prediction prompts **before** running anything, then implement its `todo!()` bodies from the contracts. Replace each lesson's `todo!()` bodies as you progress. Check your work with:
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
 
-```sh
-cargo test --test chapter03 l01_
-```
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter03 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests count heap allocations or compare pointers, so a copy-everything solution fails. Then run `cargo clippy --test chapter03` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch03` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), add one edge-case test, then compare with *Check your explanation* in [HINTS.md](HINTS.md).
 
-The unfinished exercises compile, but their tests fail intentionally when they reach `todo!()`.
-Filtering by lesson runs only that lesson; unfinished later lessons will not run.
-Leave the tests intact. You can add cases of your own.
+After the numbered lessons, do the **code review** lesson (c01: fix a teammate's working-but-wrong code). From Chapter 4 on, each chapter also opens with a review lesson that brings this chapter back from memory. Run `cargo progress` to see where you are and which chapters are due for spaced review.
 
-## How to work through a lesson
-
-1. **Predict:** write down the answers at the top of the lesson without executing the examples.
-2. **Implement:** replace its `todo!()` bodies. Read the contracts, then the tests.
-3. **Check:** run that lesson's command. Treat a failure as feedback about one specific behavior.
-4. **Experiment:** use [the scratch example](../../examples/ch03_scratch.rs) for the compiler lab. Repair or remove each experiment before trying the next one.
-5. **Explain:** answer the lesson's explanation questions in your own words. Passing tests alone does not finish a lesson.
-6. **Transfer:** invent one new edge case and predict its result before adding a test.
-
-If stuck, start with the relevant section of the chapter. Then open [HINTS.md](HINTS.md), which has two levels of hints per lesson. There is no answer key in the exercise files.
-
-For guided review with a study partner or tutor, share the lesson number, your predictions and explanations, and your implementation or test failure.
+The unfinished exercises compile, but their tests fail intentionally at `todo!()` and `guess()`. Filtering by lesson runs only that lesson. Leave the tests intact; you can add cases of your own. If stuck, start with the relevant section of the chapter, then open [HINTS.md](HINTS.md). There is no answer key in the exercise files. For guided review with a study partner or tutor, share the lesson number, your predictions and explanations, and your implementation or test failure.
 
 ## Route through the chapter
 
@@ -49,26 +39,17 @@ Check a lesson off after its tests **and** explanation prompts are complete. A l
 | [ ] | [11 · Strings and literals](l11_strings.rs) | Build owned text, borrow input, use raw literals, and remove a whole Unicode scalar. |
 | [ ] | [12 · Boundary types and aliases](l12_boundary_types.rs) | Choose text, bytes, paths, OS strings, or C strings at system boundaries; use an alias. |
 | [ ] | [13 · Capstone](l13_capstone.rs) | Combine these decisions into a small sensor-report API. |
-
-Use the same command pattern for each lesson:
-
-```sh
-cargo test --test chapter03 l03_
-cargo test --test chapter03 l10_
-```
-
-To list all checks without running them:
+| [ ] | [C01 · Code review: a teammate's pull request](c01_code_review.rs) | Find overflow, Unicode, and copying bugs in working-looking code; fix them and clear clippy. |
+| [ ] | [Compiler drills](../../drills/ch03/) — `cargo drill ch03` | Predict which programs compile, panic, or run, then fix them. |
 
 ```sh
+cargo test --test chapter03 l01_
 cargo test --test chapter03 -- --list
-```
-
-To check the complete chapter after finishing the lessons:
-
-```sh
 cargo test --test chapter03
 cargo test --release --test chapter03
-cargo fmt --check
+cargo clippy --test chapter03
+cargo drill ch03
+cargo run --example ch03_scratch
 ```
 
 The release run matters: explicit overflow methods should keep the same behavior across build profiles.

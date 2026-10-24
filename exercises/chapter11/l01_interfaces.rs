@@ -1,8 +1,9 @@
 //! LESSON 01 — Traits, implementations, and defaults
 //! Run: cargo test --test chapter11 l01_
 //!
-//! PREDICT before executing: Can a default method call a required method? Does importing a
-//! type also import every extension trait?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: Can a default method call a required method?
+//! Does importing a type also import every extension trait?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Which method does your implementation supply, and which comes from
@@ -38,6 +39,7 @@ fn describe_brief<T: Describe>(value: &T) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
     #[test]
     fn a_implements_required_behavior() {
         assert_eq!(
@@ -72,6 +74,77 @@ mod tests {
                 channels: 1
             }),
             "[🦀/1]"
+        );
+    }
+
+    #[test]
+    fn b_brief_calls_the_trait_method_not_a_copy_of_it() {
+        struct Angle;
+        impl Describe for Angle {
+            fn description(&self) -> String {
+                "angle".into()
+            }
+            fn brief(&self) -> String {
+                "<angle>".into()
+            }
+        }
+        assert_eq!(describe_brief(&Angle), "<angle>");
+    }
+
+    trait Greet {
+        fn name(&self) -> String;
+        fn hello(&self) -> String {
+            format!("hi {}", self.name())
+        }
+    }
+    struct Plain;
+    impl Greet for Plain {
+        fn name(&self) -> String {
+            "plain".into()
+        }
+    }
+    struct Loud;
+    impl Greet for Loud {
+        fn name(&self) -> String {
+            "loud".into()
+        }
+        fn hello(&self) -> String {
+            self.name().to_uppercase()
+        }
+    }
+
+    trait Exclaim {
+        fn exclaim(&self) -> String;
+    }
+    impl<T: std::fmt::Display + ?Sized> Exclaim for T {
+        fn exclaim(&self) -> String {
+            format!("{self}!")
+        }
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    /// A wrong prediction is useful: read the failure, then explain it in NOTES.md.
+    #[test]
+    fn p_predictions() {
+        // P1. Plain keeps the default `hello`; Loud overrides it. What does each return?
+        let p1: (String, String) = guess();
+        assert_eq!(p1, (Plain.hello(), Loud.hello()), "P1: default vs override");
+
+        // P2. Implementing a trait adds methods. Does it add bytes to each value?
+        let p2: usize = guess();
+        assert_eq!(
+            p2,
+            size_of::<Plain>(),
+            "P2: size of a unit struct with a trait"
+        );
+
+        // P3. A blanket impl gives `exclaim` to every Display type, including ones
+        // this crate did not define.
+        let p3: (String, String, String) = guess();
+        assert_eq!(
+            p3,
+            (7.exclaim(), 'x'.exclaim(), 1.50_f64.exclaim()),
+            "P3: blanket implementation"
         );
     }
 }

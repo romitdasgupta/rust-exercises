@@ -5,13 +5,23 @@
 Original guided exercises for [*Programming Rust*, 3rd edition, chapter 17](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch17.html).
 Read the corresponding book sections alongside these exercises. These are new problems, not reproductions of the book’s examples.
 
-This chapter has **9 lessons, 28 implementation tasks, and 29 automated checks**, plus prediction, compiler/manual, explanation, and transfer work.
+This chapter has **9 lessons and 28 implementation tasks**, plus a review lesson, a code-review lesson, 10 compiler drills, and prediction, compiler/manual, explanation, and transfer work.
 The starter functions intentionally contain `todo!()`: they compile, and tests fail until you implement the contracts. Keep the supplied tests intact. Type signatures/trait scaffolds are provided so each lesson compiles independently; reconstruct their bounds in the compiler labs to practice design rather than only filling method bodies.
 
 ## Work through the chapter
 
-For each lesson: predict before running; implement one task; run its filter; complete the lab in [the scratch example](../../examples/ch17_scratch.rs); explain the ownership/trait/API choices; add a transfer case.
-Read [Hint 1 before Hint 2](HINTS.md) only if stuck. Passing tests alone does not demonstrate mastery.
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
+
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter17 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests count heap allocations or compare buffer pointers, so a solution that builds throwaway Strings where the contract says *borrow* or *no intermediate String* fails. Then run `cargo clippy --test chapter17` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch17` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), add one edge case of your own, complete the lesson's lab in [the scratch example](../../examples/ch17_scratch.rs), then compare with *Check your explanation* in [HINTS.md](HINTS.md).
+
+After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
+
+Open [HINTS.md](HINTS.md) one hint at a time, and only after a real attempt. Passing tests alone does not demonstrate mastery.
 
 | Done | Lesson | Check |
 | --- | --- | --- |
@@ -24,15 +34,20 @@ Read [Hint 1 before Hint 2](HINTS.md) only if stuck. Passing tests alone does no
 | [ ] | [07 · Display, fmt::Write, and format_args!](l07_custom_format.rs) | `cargo test --test chapter17 l07_` |
 | [ ] | [08 · UTF-8, borrowed text views, and delayed allocation](l08_representations.rs) | `cargo test --test chapter17 l08_` |
 | [ ] | [09 · Capstone: a Unicode-aware report parser](l09_capstone.rs) | `cargo test --test chapter17 l09_` |
+| [ ] | [R01 · Review: Chapters 3, 7, 10, 15, 16 from memory](r01_review.rs) | `cargo test --test chapter17 r01_` |
+| [ ] | [C01 · Code review: a teammate's pull request](c01_code_review.rs) | `cargo test --test chapter17 c01_` |
+| [ ] | [Compiler drills](../../drills/ch17/) | `cargo drill ch17` |
 
 Run commands from the repository root:
 
 ```sh
-cargo test --test chapter17 --no-run
+cargo test --test chapter17 l01_
 cargo test --test chapter17 -- --list
-cargo run --example ch17_scratch
 cargo test --test chapter17
 cargo test --release --test chapter17
+cargo clippy --test chapter17
+cargo drill ch17
+cargo run --example ch17_scratch
 ```
 
 Some labs deliberately fail to compile or panic. Keep them in scratch and restore a compiling example afterward. Do not put intentional compilation failures in the test modules. Tests are deterministic and require only the standard library; any separate dependency lab is described below.

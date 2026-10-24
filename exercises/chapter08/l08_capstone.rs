@@ -19,17 +19,21 @@ mod core {
 }
 pub use core::tag;
 /// B. Apply the public API to all inputs in order. Return Err(zero_based_index)
-/// at the first invalid name; no partial successful vector on error.
+/// at the first invalid name; no partial successful vector on error. Stop at
+/// that name: the names after it are never tagged.
 fn tag_batch(names: &[&str]) -> Result<Vec<String>, usize> {
     todo!("Implement this task")
 }
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::alloc::count;
     #[test]
     fn a_facade_exposes_behavior() {
         assert_eq!(tag(" 港 "), Some("tag:港".into()));
         assert_eq!(tag(" \n"), None);
+        assert_eq!(tag("a:b"), Some("tag:a:b".into()));
+        assert_eq!(tag(""), None);
     }
     #[test]
     fn b_library_api_is_independent_of_cli() {
@@ -39,5 +43,18 @@ mod tests {
         );
         assert_eq!(tag_batch(&["a", "", "b"]), Err(1));
         assert_eq!(tag_batch(&[]), Ok(vec![]));
+        assert_eq!(tag_batch(&["a", "b", "\t"]), Err(2));
+        assert_eq!(tag_batch(&[" ", ""]), Err(0), "the FIRST invalid index");
+    }
+    #[test]
+    fn b_batch_stops_at_the_first_invalid_name() {
+        let mut names = vec![""];
+        names.extend(std::iter::repeat_n("valid", 100));
+        let (result, allocations) = count(|| tag_batch(&names));
+        assert_eq!(result, Err(0));
+        assert!(
+            allocations <= 1,
+            "names after the error should not be tagged; got {allocations} allocations"
+        );
     }
 }

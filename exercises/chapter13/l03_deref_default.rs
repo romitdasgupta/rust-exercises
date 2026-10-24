@@ -1,8 +1,9 @@
 //! LESSON 03 — Deref, DerefMut, and Default
 //! Run: cargo test --test chapter13 l03_
 //!
-//! PREDICT before executing: Does Deref transfer ownership? Can deref coercion change
-//! &Wrapper into &[i32]? Is Default necessarily all zero bytes?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: Does Deref transfer ownership? Can deref
+//! coercion change &Wrapper into &[i32]? Is Default necessarily all zero bytes?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: When is a transparent wrapper a suitable Deref design? Why should a
@@ -40,6 +41,7 @@ impl Default for Samples {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
     fn first(xs: &[i32]) -> Option<i32> {
         xs.first().copied()
     }
@@ -62,5 +64,53 @@ mod tests {
     #[test]
     fn c_default_has_a_meaningful_empty_state() {
         assert_eq!(Samples::default(), Samples(vec![]));
+    }
+
+    #[test]
+    fn a_b_deref_views_the_same_storage() {
+        let mut s = Samples(vec![1, 2, 3]);
+        assert_eq!(s.as_ptr(), s.0.as_ptr());
+        s.reverse();
+        assert_eq!(s.0, [3, 2, 1]);
+        assert_eq!(s.iter().sum::<i32>(), 6);
+    }
+
+    struct Tagged(Vec<i32>);
+    impl Deref for Tagged {
+        type Target = [i32];
+        fn deref(&self) -> &[i32] {
+            &self.0
+        }
+    }
+    impl Tagged {
+        fn len(&self) -> usize {
+            99
+        }
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Tagged has an inherent `len`, and derefs to a slice that has one too.
+        let t = Tagged(vec![4, 5]);
+        let p1: (usize, usize, Option<&i32>) = guess();
+        assert_eq!(
+            p1,
+            (t.len(), (*t).len(), t.first()),
+            "P1: method lookup and Deref"
+        );
+
+        // P2. Default values of some standard types.
+        let p2: (u8, Option<u8>, usize, char) = guess();
+        assert_eq!(
+            p2,
+            (
+                u8::default(),
+                Option::<u8>::default(),
+                String::default().capacity(),
+                char::default()
+            ),
+            "P2: Default"
+        );
     }
 }

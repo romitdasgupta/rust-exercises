@@ -1,10 +1,12 @@
 //! LESSON 06 — Pointer types encode different policies
 //! Run: cargo test --test chapter03 l06_
 //!
-//! PREDICT: Which types borrow and which own an allocation: `&T`, `&mut T`,
-//! `Box<T>`, `Rc<T>`, `Arc<T>`? When does each owned allocation get freed?
-//! Does cloning an Rc clone its string contents? What does Arc add to Rc?
-//! Arc's count is atomic; it does not by itself synchronize mutation of its contents.
+//! PREDICT: first answer `p_predictions` at the bottom (replace each `guess()`
+//! with your answer). Then consider: Which types borrow and which own an
+//! allocation: `&T`, `&mut T`, `Box<T>`, `Rc<T>`, `Arc<T>`? When does each
+//! owned allocation get freed? Does cloning an Rc clone its string contents?
+//! What does Arc add to Rc? Arc's count is atomic; it does not by itself
+//! synchronize mutation of its contents.
 //!
 //! EXPLAIN: Why are nested Rust tuples values stored together rather than
 //! automatically separate heap objects? Why use `Option<&T>` for absence?
@@ -51,6 +53,7 @@ fn visible_value(value: &i32, visible: bool) -> Option<&i32> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
 
     #[test]
     fn a_mutable_borrow_changes_the_original() {
@@ -95,5 +98,69 @@ mod tests {
         let borrowed = visible_value(&value, true).expect("visible value missing");
         assert!(std::ptr::eq(borrowed, &value));
         assert_eq!(visible_value(&value, false), None);
+    }
+
+    #[test]
+    fn b_c_d_each_pointer_allocates_once() {
+        let (_, allocations) = count(|| boxed_point(1, 2));
+        assert!(
+            allocations <= 1,
+            "one Box, one allocation; got {allocations}"
+        );
+        let (_, allocations) = count(|| share_label("sensor north"));
+        assert!(
+            allocations <= 2,
+            "one String buffer and one Rc allocation; got {allocations}"
+        );
+        let (_, allocations) = count(|| share_count(7));
+        assert!(allocations <= 1, "one Arc allocation; got {allocations}");
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Box<i32> size in machine words, and whether Option<&i32> is
+        // the same size as &i32 (references are never null).
+        let p1: (usize, bool) = guess();
+        assert_eq!(
+            p1,
+            (
+                size_of::<Box<i32>>() / size_of::<usize>(),
+                size_of::<&i32>() == size_of::<Option<&i32>>()
+            ),
+            "P1: pointer sizes"
+        );
+
+        // P2. Strong counts inside the block, and after it ends.
+        let a = Rc::new(String::from("x"));
+        let b = Rc::clone(&a);
+        let inside;
+        {
+            let c = Rc::clone(&b);
+            inside = Rc::strong_count(&a);
+        }
+        let p2: (usize, usize) = guess();
+        assert_eq!(p2, (inside, Rc::strong_count(&a)), "P2: Rc counts");
+
+        // P3. Moving a Box: does the heap value move to a new address?
+        let boxed = Box::new(5);
+        let address: *const i32 = &*boxed;
+        let moved = boxed;
+        let p3: bool = guess(); // true if `moved` points at the same address
+        assert_eq!(
+            p3,
+            std::ptr::eq(address, &*moved),
+            "P3: a move copies the pointer"
+        );
+
+        // P4. Raw pointers can be null; references cannot.
+        let value = 5;
+        let raw: *const i32 = &value;
+        let p4: (bool, bool) = guess();
+        assert_eq!(
+            p4,
+            (raw.is_null(), std::ptr::null::<i32>().is_null()),
+            "P4: raw pointer nullability"
+        );
     }
 }

@@ -2,52 +2,86 @@
 
 A chapter-by-chapter practice companion to [*Programming Rust*, 3rd edition](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/), covering Chapter 3 and every remaining technical chapter (4–24).
 
-Chapters 4–24 add **167 guided lessons and 396 core implementation tasks**, plus **7 implementation tasks in the isolated random and regex packages**. Every chapter includes a capstone and a map from the book sections to its exercises or labs.
+Chapters 3–24 contain **180 guided lessons, 21 spaced-review lessons, 22 code-review lessons, about 550 checked predictions, 217 compiler drills, and over 1,000 tests**. Every chapter includes a capstone and a map from the book sections to its exercises or labs. Two further tracks take you from the book to everyday professional Rust: a [production-crates track](ecosystem/README.md), and [loglens](project/README.md), a real program you grow and refactor across the chapters (see [Beyond the book](#beyond-the-book)).
 
-The exercises are original practice problems, not a reproduction of the book. Read the corresponding chapter alongside them. Each chapter has its own guide, lesson files, progressive hints, tests, compiler experiments, coverage map, and capstone.
+The exercises are original practice problems, not a reproduction of the book. Read the corresponding chapter alongside them. Each chapter has its own guide, lessons, compiler drills, progressive hints with model explanations, a notes workbook, a coverage map, and a capstone.
 
 ## Fresh clone setup
 
-Install Git and [Rust through rustup](https://www.rust-lang.org/tools/install). The repository pins Rust **1.99.0** and uses edition 2024. Rustup installs the pinned toolchain when you first run Cargo in this directory. Install the formatting component explicitly if your rustup profile does not include it.
-
-Clone the repository:
+Install Git and [Rust through rustup](https://www.rust-lang.org/tools/install). The repository pins Rust **1.99.0** with rustfmt and clippy, and uses edition 2024. Rustup installs the pinned toolchain the first time you run Cargo in this directory.
 
 ```sh
 git clone https://github.com/romitdasgupta/rust-exercises.git
 cd rust-exercises
-rustup toolchain install 1.99.0 --profile minimal --component rustfmt
 cargo test --locked --offline --all-targets --no-run
 cargo test --locked --offline --release --all-targets --no-run
-cargo fmt --all -- --check
-cargo test --test chapter03 -- --list
+cargo progress
 ```
 
-The build commands compile the exercises without executing unfinished functions. No external crates or network access are needed for these core checks once Rust is installed. Run all commands in this guide and the chapter guides from the repository root unless a lab says otherwise.
+Run `cargo progress` once before you edit anything: it saves a copy of every untouched lesson so you can redo it later.
 
-This is a practice repository with partially completed Chapter 3 work and unfinished exercises throughout. Some tests already pass; others intentionally fail at `todo!`. Start by listing tests, then work through one lesson at a time.
+The build commands compile every exercise without running unfinished functions. The core needs no external crates or network access once Rust is installed. Run all commands from the repository root unless a lab says otherwise.
+
+Every exercise starts unfinished: tests fail at `todo!()` and `guess()` until you fill them in. That's the starting state, not a broken setup.
+
+## How you will learn
+
+Reading about Rust and recognizing it later is not the same as writing it under pressure. These exercises are built on the techniques that make skills last: **predicting before you see the answer, retrieving from memory, getting immediate feedback, explaining in writing, and revisiting material on a spaced schedule.**
+
+For each lesson:
+
+1. **Read** the book section.
+2. **Predict.** Each lesson ends with a `p_predictions` test. Replace each `guess()` with what you think the code produces, *before running anything*. Wrong guesses are the most valuable part: write down why in the chapter's `NOTES.md`. Once every prediction in a file is answered, the compiler warns that `guess` is an unused import; delete it from the `use` line.
+3. **Implement** the `todo!()` bodies from their contracts and run only that lesson: `cargo test --test chapter04 l01_`.
+4. **Check your technique.** Some tests count heap allocations or compare pointers, so a solution that clones everything fails even when its output is right. Run `cargo clippy --test chapter04` and fix its warnings in your code; clippy encodes the idioms that experienced Rust programmers use.
+5. **Drill the compiler.** `cargo drill ch04` gives you short programs. Predict whether each compiles (and with which error code) or panics, see the verdict, then fix the program. Reading compiler errors fluently is most of day-to-day Rust.
+6. **Explain** in `NOTES.md`, add an edge-case test, then compare with *Check your explanation* in the chapter's `HINTS.md`.
+
+Each chapter also has:
+
+- **R01, a review lesson.** It mixes earlier chapters into new problems, done from memory. Mixing topics feels harder than practicing one at a time, and that is why it sticks.
+- **C01, a code-review lesson.** A teammate's code that compiles but has bugs, needless clones, and poor signatures. You review it, fix it, and clear the clippy warnings, as you would at work.
+- **A capstone**, redone from its contract during spaced reviews.
+
+### Your daily session
+
+```sh
+cargo progress          # where you are, the next lesson, and reviews due today
+```
+
+A good session is 45–60 minutes: clear any reviews that are due first, then continue with the next lesson. When a whole chapter passes, `cargo progress` schedules reviews 1, 3, 7, 21, and 60 days later. A review means:
+
+1. Answer the chapter's mastery questions in `NOTES.md` from memory.
+2. Run `cargo drill reset ch04` and predict the drills again.
+3. Run `cargo progress redo ch04 l08` to archive your capstone and restore its starter, then solve it again from the contract.
+4. Record it with `cargo progress reviewed ch04`.
+
+Your progress history lives in `.progress/`, which Git ignores.
+
+When you finish a chapter, also fill in its row in [DECISIONS.md](DECISIONS.md). It condenses the chapter into the judgment calls you make while writing real code: borrow or own, generic or `dyn`, `Mutex` or channel.
+
+### Tools at a glance
+
+| Command | What it does |
+| --- | --- |
+| `cargo test --test chapter04 l01_` | Run one lesson (use `r01_`, `c01_` for review and code review). |
+| `cargo clippy --test chapter04` | Lint a chapter; fix the warnings in your code. |
+| `cargo drill` / `cargo drill ch04` | Drill summary, or work through a chapter's compiler drills. |
+| `cargo drill reset ch04` | Restore a chapter's drills to predict them again. |
+| `cargo progress` | Lesson status, next step, and spaced reviews due. |
+| `cargo progress redo ch04 l08` | Archive your solution and restore the lesson's starter. |
+| `cargo progress reviewed ch04` | Record a completed review; schedules the next one. |
+| `cargo run --example ch04_scratch` | Free-form experiments for a chapter. |
 
 ## Begin or continue
 
-Start with [Chapter 3: Fundamental Types](exercises/chapter03/README.md), or continue with [Chapter 4: Ownership and Moves](exercises/chapter04/README.md).
+Start with [Chapter 3: Fundamental Types](exercises/chapter03/README.md), or with [Chapter 4: Ownership and Moves](exercises/chapter04/README.md) if you are comfortable with Rust's basic types. Chapter 4 shows every element described above.
 
-1. Open a chapter guide and follow its lesson order.
-2. Write your predictions before running an example or looking up an answer.
-3. Replace the lesson's `todo!()` bodies, keeping the test contracts intact.
-4. Run only that lesson while you work:
-
-   ```sh
-   cargo test --test chapter04 l01_
-   ```
-
-5. Use its compiler lab to explore the boundary between accepted and rejected programs. There is a scratch example for each chapter: `cargo run --example ch04_scratch`.
-6. Answer the explanation questions and add an edge case of your own before checking the lesson off.
-7. Finish the capstone, then repeat it later from the contract without consulting your previous implementation.
-
-For review with a study partner or tutor, share the lesson number, your predictions, and your code or test output. The [hint directory](HINTS.md) links to two progressive hints per lesson.
+For review with a study partner or tutor, share the lesson number, your predictions, your `NOTES.md`, and your code or test output. The [hint directory](HINTS.md) links to two progressive hints per lesson, and a model explanation to compare against your own.
 
 ## Chapters
 
-Check a chapter off only after its code, labs, explanation prompts, and capstone are complete.
+Check a chapter off only after its lessons, predictions, drills, review, code review, notes, and capstone are complete.
 
 | Done | Chapter | Guide | Run the chapter |
 | --- | --- | --- | --- |
@@ -92,16 +126,28 @@ cargo test --test chapter04 l01_
 cargo test --test chapter04
 cargo test --release --test chapter04
 
+cargo clippy --test chapter04
 cargo fmt --check
+
+# Compiler drills and progress (see "Tools at a glance").
+cargo drill ch04
+cargo progress
 ```
 
-Unimplemented functions deliberately panic at `todo!()`. A failing exercise is the starting state, not a broken installation. Do not run the whole book's tests expecting a green result before completing the exercises. Compiler labs deliberately include snippets that should fail to compile; keep those experiments in the scratch files or isolated lab projects and restore them afterward.
+Unimplemented functions deliberately panic at `todo!()`, and unanswered predictions at `guess()`. A failing exercise is the starting state, not a broken installation. Do not run the whole book's tests expecting a green result before completing the exercises. Compiler labs deliberately include snippets that should fail to compile; keep those experiments in the scratch files or isolated lab projects and restore them afterward.
 
 The supported toolchain is Rust 1.99.0, pinned in `rust-toolchain.toml`; the package uses edition 2024. Some lessons intentionally explore edition rules and recent features described in the third edition. Compiler diagnostics and opaque type names may differ across toolchains; test contracts focus on behavior rather than exact diagnostic wording.
 
 ## Your main.rs playground
 
 `src/main.rs` is your personal experiment file. Run it with `cargo run --features playground`. The feature is off during the chapter tests, so an intentional compiler error in the playground does not block your exercise checks. Scratch examples are compiled by `--all-targets`, so repair intentional scratch errors before running that broad check.
+
+## Beyond the book
+
+| Track | When | What it practices |
+| --- | --- | --- |
+| [loglens, the running project](project/README.md) | Start after Chapter 3; each milestone follows its chapter | One real command-line log analyzer built in 16 milestones across Chapters 3–24: zero-copy parsing, error types, traits, closures, iterator pipelines, reports, streaming I/O, parallel files, macros, and an optional async reader and unsafe fast path. Later milestones refactor earlier code with new tools, while the earlier tests keep you safe. Standard library only. `cd project && cargo test --test m03_types` |
+| [Production crates](ecosystem/README.md) | E01 after Chapter 7; the rest as their chapters are done | serde, thiserror and anyhow, clap, tracing, proptest, tokio, and everyday Cargo tooling, with "why this crate, and what are the alternatives" judgment for each. A standalone package with pinned dependencies (one download, then offline). |
 
 ## Labs that need another tool or crate
 
@@ -123,13 +169,13 @@ For unsafe and FFI work, satisfy the supplied safety contracts and explain them 
 
 ## How to judge mastery
 
-A green test result checks the required behavior. It does not prove that you used the intended technique or can explain the design. Use each chapter's coverage table and mastery questions as a second checklist. Be ready to describe ownership, invariants, error behavior, and edge cases, then solve a changed version of the problem without copying your solution.
+A green test result checks the required behavior, and technique tests catch many wrong approaches, such as extra clones, sequential versions of concurrent tasks, or missed borrows. Tests still cannot prove you understand the design or can explain it. Use each chapter's coverage table, mastery questions, and your NOTES.md as a second checklist, and keep up the spaced reviews that `cargo progress` schedules. Be ready to describe ownership, invariants, error behavior, and edge cases, then solve a changed version of the problem without copying your solution.
 
 ## Validation scope
 
-A clean starter checkout should compile all 22 chapter targets (3–24) and their scratch examples offline in debug and release profiles using the fresh-clone commands above. Formatting is checked separately. The isolated random, regex, and external macro-consumer packages have their own manifests and are not included in the root Cargo checks. The first two need a dependency download before offline builds work. The [starter CI workflow](.github/workflows/ci.yml) checks formatting and compiles the core (including the playground) and all three extension packages in both profiles on Linux, macOS, and Windows; it deliberately does not execute unfinished exercises.
+A clean starter checkout should compile all 22 chapter targets (3–24) and their scratch examples offline in debug and release profiles using the fresh-clone commands above. Formatting is checked separately. The isolated random, regex, external macro-consumer, production-crates, and loglens packages have their own manifests and are not included in the root Cargo checks. The random, regex, and production-crates packages need a dependency download before offline builds work. The [starter CI workflow](.github/workflows/ci.yml) checks formatting and clippy, runs the coach's own tests, and compiles the core (including the playground) and every extension package in both profiles on Linux, macOS, and Windows; it deliberately does not execute unfinished exercises.
 
-Running unfinished tests is expected to fail. Compilation checks establish that a learner can start; they do not establish that unfinished implementations are correct. No complete reference solution is shipped. Tests also do not prove that an unsafe abstraction is sound for every possible caller: its written safety argument is part of the exercise.
+Running unfinished tests is expected to fail. Compilation checks establish that a learner can start; they do not establish that unfinished implementations are correct. Each chapter, the loglens project, and the production-crates track were checked against a full reference solution in debug and release builds (on Linux), but no reference solution is shipped. [AUTHORING.md](AUTHORING.md) describes that check for new lessons. Tests also do not prove that an unsafe abstraction is sound for every possible caller: its written safety argument is part of the exercise.
 
 Compiler experiments and the assigned Cargo/process, Tokio, Mio, Rayon, compression, procedural-macro, generic gap-buffer, Miri, native C/libgit2, and platform-specific projects are manual practice. They are outside the automated core checks. Their prerequisites and acceptance criteria are stated in the chapter guides or lab instructions.
 

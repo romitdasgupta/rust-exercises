@@ -1,7 +1,7 @@
 //! LESSON 07 — Capstone: configurable text processing
 //! Run: cargo test --test chapter14 l07_
 //!
-//! PREDICT before executing: Decide whether each callback needs Fn, FnMut, or FnOnce.
+//! PREDICT before running: Decide whether each callback needs Fn, FnMut, or FnOnce.
 //! Predict the audit state for duplicate and rejected rows.
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
@@ -34,6 +34,7 @@ fn finish_report<F: FnOnce(usize) -> String>(count: usize, finish: F) -> String 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::cell::RefCell;
     #[test]
     fn a_policies_run_in_documented_order() {
         let mut seen = vec![];
@@ -82,6 +83,29 @@ mod tests {
         );
     }
     #[test]
+    fn a_each_row_is_finished_before_the_next_is_examined() {
+        let events = RefCell::new(Vec::new());
+        let out = process(
+            &["a", "", "b"],
+            |s| {
+                events.borrow_mut().push(format!("keep {s}"));
+                !s.is_empty()
+            },
+            |s| {
+                events.borrow_mut().push(format!("format {s}"));
+                s.to_uppercase()
+            },
+            |s| events.borrow_mut().push(format!("audit {s}")),
+        );
+        assert_eq!(out, ["A", "B"]);
+        assert_eq!(
+            *events.borrow(),
+            [
+                "keep a", "format a", "audit A", "keep ", "keep b", "format b", "audit B"
+            ]
+        );
+    }
+    #[test]
     fn b_finish_can_consume_owned_data() {
         let prefix = String::from("count");
         assert_eq!(
@@ -91,5 +115,6 @@ mod tests {
             }),
             "count=3"
         );
+        assert_eq!(finish_report(0, |n| n.to_string()), "0");
     }
 }

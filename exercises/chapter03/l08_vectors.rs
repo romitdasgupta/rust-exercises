@@ -1,9 +1,11 @@
 //! LESSON 08 — Growable owned sequences
 //! Run: cargo test --test chapter03 l08_
 //!
-//! PREDICT: What are the length and minimum capacity of `Vec::<u8>::with_capacity(8)`?
-//! Can you immediately index its first element? Which three pieces of metadata
-//! describe a Vec? What can happen when a push exceeds its capacity?
+//! PREDICT: first answer `p_predictions` at the bottom (replace each `guess()`
+//! with your answer). Then consider: What are the length and minimum capacity
+//! of `Vec::<u8>::with_capacity(8)`? Can you immediately index its first
+//! element? Which three pieces of metadata describe a Vec? What can happen when
+//! a push exceeds its capacity?
 //!
 //! EXPLAIN: Why is capacity not the same as length? Why avoid asserting a
 //! particular allocation growth factor? How do insert/remove differ from pop
@@ -38,6 +40,8 @@ fn pop_last(values: &mut Vec<i32>) -> Option<i32> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::{alloc::count, guess};
+    use std::hint::black_box;
 
     #[test]
     fn a_collect_can_infer_vec_from_the_return_type() {
@@ -71,5 +75,42 @@ mod tests {
         assert_eq!(pop_last(&mut values), Some(3));
         assert_eq!(pop_last(&mut values), None);
         assert!(values.is_empty());
+    }
+
+    #[test]
+    fn c_reserving_then_pushing_allocates_once() {
+        let ((values, _, _), allocations) = count(|| reserved_bytes(100));
+        assert_eq!(values.len(), 100);
+        assert!(
+            allocations <= 1,
+            "reserve once, then push into that buffer; got {allocations} allocations"
+        );
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    #[test]
+    fn p_predictions() {
+        // P1. Length, and whether capacity is at least 8.
+        let reserved = Vec::<u8>::with_capacity(8);
+        let p1: (usize, bool) = guess();
+        assert_eq!(
+            p1,
+            (reserved.len(), reserved.capacity() >= 8),
+            "P1: capacity is not length"
+        );
+
+        // P2. Contents after these edits, in this order.
+        let mut v = vec![1, 2, 3];
+        v.insert(1, 9);
+        v.remove(0);
+        v.pop();
+        let p2: Vec<i32> = guess();
+        assert_eq!(p2, v, "P2: insert, remove, pop");
+
+        // P3. Heap allocations made by Vec::new() and by with_capacity(4).
+        let (_, empty) = count(|| black_box(Vec::<u8>::new()));
+        let (_, reserved) = count(|| black_box(Vec::<u8>::with_capacity(4)));
+        let p3: (usize, usize) = guess();
+        assert_eq!(p3, (empty, reserved), "P3: an empty Vec does not allocate");
     }
 }

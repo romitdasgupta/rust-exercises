@@ -4,11 +4,20 @@
 
 Original exercises accompanying [Programming Rust, 3rd edition, chapter 19](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch19.html). Read the corresponding section, then practice without copying the book's examples.
 
-## Working route
+## Work through the chapter
 
-Predict on paper first. Implement one lesson's TODOs, run its filtered tests, do its scratch experiment, and explain the result in your own words. Add one edge case of your own. Open [HINTS.md](HINTS.md) only after an attempt. Passing tests is one part of mastery; the explanation and labs matter too.
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
 
-The starter compiles; unfinished TODOs intentionally fail when reached. Keep the supplied tests. Each lesson is independent, including the capstone, so later unfinished tasks do not block an earlier lesson.
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter19 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests count threads, probe locks with `try_lock`/`try_read`, or put a time limit on a pipeline, so a solution that holds a lock too long, runs on one thread, or deadlocks fails with a message. Then run `cargo clippy --test chapter19` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch19` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), add one edge-case test, then compare with *Check your explanation* in [HINTS.md](HINTS.md).
+
+After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
+
+The starter compiles; unfinished TODOs intentionally fail when reached. Keep the supplied tests. Each lesson is independent, including the capstone, so later unfinished tasks do not block an earlier lesson. Test names start with the task letter (`a_`, `b_`, ...), so `cargo test --test chapter19 l06_coordination::tests::a_` runs one task's tests.
 
 | Done | Lesson | Coding tasks |
 | --- | --- | --- |
@@ -20,6 +29,9 @@ The starter compiles; unfinished TODOs intentionally fail when reached. Keep the
 | [ ] | [l06 · RwLock and condition predicates](l06_coordination.rs) | 3 |
 | [ ] | [l07 · Atomic counters and local state](l07_atomics_tls.rs) | 2 |
 | [ ] | [l08 · Capstone: bounded parallel pipeline](l08_capstone.rs) | 2 |
+| [ ] | [R01 · Review: Chapters 14–18 from memory](r01_review.rs) | 3 |
+| [ ] | [C01 · Code review: a teammate's pull request](c01_code_review.rs) | 2 |
+| [ ] | [Compiler drills](../../drills/ch19/) — `cargo drill ch19` | 10 |
 
 ```sh
 cargo test --test chapter19 l01_
@@ -27,6 +39,8 @@ cargo test --test chapter19 -- --list
 # After completing all lessons:
 cargo test --test chapter19
 cargo test --release --test chapter19
+cargo clippy --test chapter19
+cargo drill ch19
 cargo run --example ch19_scratch
 ```
 

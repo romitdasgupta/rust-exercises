@@ -5,13 +5,21 @@
 Original guided exercises for [*Programming Rust*, 3rd edition, chapter 15](https://learning.oreilly.com/library/view/programming-rust-3rd/9781098176228/ch15.html).
 Read the corresponding book sections alongside these exercises. These are new problems, not reproductions of the book’s examples.
 
-This chapter has **11 lessons, 34 implementation tasks, and 35 automated checks**, plus prediction, compiler/manual, explanation, and transfer work.
+This chapter has **11 lessons and 34 implementation tasks**, a review lesson, a code-review lesson, and 10 compiler drills, with **60 automated checks**, plus prediction, compiler/manual, explanation, and transfer work.
 The starter functions intentionally contain `todo!()`: they compile, and tests fail until you implement the contracts. Keep the supplied tests intact. Type signatures/trait scaffolds are provided so each lesson compiles independently; reconstruct their bounds in the compiler labs to practice design rather than only filling method bodies.
 
 ## Work through the chapter
 
-For each lesson: predict before running; implement one task; run its filter; complete the lab in [the scratch example](../../examples/ch15_scratch.rs); explain the ownership/trait/API choices; add a transfer case.
-Read [Hint 1 before Hint 2](HINTS.md) only if stuck. Passing tests alone does not demonstrate mastery.
+Every lesson uses the same loop. It is built on *retrieval practice*: you keep what you predict, struggle with, and explain, not what you reread.
+
+1. **Read** the book section for the lesson.
+2. **Predict.** Open the lesson and answer its `p_predictions` test: replace each `guess()` with a value. Don't run anything yet.
+3. **Implement** the `todo!()` bodies from their contracts and run `cargo test --test chapter15 l01_`. A failed prediction is feedback: write in [NOTES.md](NOTES.md) why you were wrong.
+4. **Check technique.** Some tests count heap allocations or compare pointers, so a solution that collects intermediate vectors or clones items fails. Then run `cargo clippy --test chapter15` and fix warnings in your code.
+5. **Drill the compiler.** `cargo drill ch15` shows small programs; predict whether each compiles (and which error), then fix it.
+6. **Explain** in [NOTES.md](NOTES.md), complete the lesson's lab in [the scratch example](../../examples/ch15_scratch.rs), add one edge-case test, then compare with *Check your explanation* in [HINTS.md](HINTS.md).
+
+After the numbered lessons, do the **review** lesson (r01: earlier chapters, from memory) and the **code review** lesson (c01: fix a teammate's working-but-wrong code). Run `cargo progress` to see where you are and which chapters are due for spaced review.
 
 | Done | Lesson | Check |
 | --- | --- | --- |
@@ -26,16 +34,23 @@ Read [Hint 1 before Hint 2](HINTS.md) only if stuck. Passing tests alone does no
 | [ ] | [09 · Collections, extension, and partition](l09_collecting.rs) | `cargo test --test chapter15 l09_` |
 | [ ] | [10 · Implementing a double-ended iterator](l10_custom.rs) | `cargo test --test chapter15 l10_` |
 | [ ] | [11 · Capstone: a lazy measurement report](l11_capstone.rs) | `cargo test --test chapter15 l11_` |
+| [ ] | [R01 · Review: Chapters 10–14 from memory](r01_review.rs) | `cargo test --test chapter15 r01_` |
+| [ ] | [C01 · Code review: a teammate's pull request](c01_code_review.rs) | `cargo test --test chapter15 c01_` |
+| [ ] | [Compiler drills](../../drills/ch15/) | `cargo drill ch15` |
 
 Run commands from the repository root:
 
 ```sh
-cargo test --test chapter15 --no-run
+cargo test --test chapter15 l01_
 cargo test --test chapter15 -- --list
-cargo run --example ch15_scratch
 cargo test --test chapter15
 cargo test --release --test chapter15
+cargo clippy --test chapter15
+cargo drill ch15
+cargo run --example ch15_scratch
 ```
+
+The starters compile; tests fail intentionally at `todo!()` and `guess()` until you fill them in. Keep the supplied tests intact. Use [progressive hints](HINTS.md) only after a first attempt; passing tests alone does not demonstrate mastery.
 
 Some labs deliberately fail to compile or panic. Keep them in scratch and restore a compiling example afterward. Do not put intentional compilation failures in the test modules. Tests are deterministic and require only the standard library; any separate dependency lab is described below.
 
@@ -56,6 +71,7 @@ Every main topic is assigned to a coded lesson or concrete manual/compiler lab. 
 | collect/FromIterator; Extend; partition | 09 |
 | Implementing iterators | 10 |
 | Combining lazy adapters and consumers | 11 capstone |
+| Reading iterator diagnostics (laziness, item types, missing traits) | [drills](../../drills/ch15/) d01–d10 |
 
 ## Mastery check
 

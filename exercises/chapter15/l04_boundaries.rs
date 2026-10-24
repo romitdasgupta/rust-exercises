@@ -1,8 +1,10 @@
 //! LESSON 04 — Stopping, peeking, and resuming
 //! Run: cargo test --test chapter15 l04_
 //!
-//! PREDICT before executing: Does take_while preserve the first rejected item? Does
-//! Peekable::peek consume it? Is every iterator permanently exhausted after None?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: Does take_while preserve the first rejected
+//! item? Does Peekable::peek consume it? Is every iterator permanently exhausted after
+//! None?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Why does by_ref permit continued use of the original iterator? What
@@ -31,17 +33,22 @@ fn split_two<I: Iterator<Item = i32>>(mut input: I) -> (Vec<i32>, Vec<i32>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
     #[test]
     fn a_skip_and_take_while_have_distinct_boundaries() {
         assert_eq!(active_region(&[0, 0, 3, 4, 0, 5]), [3, 4]);
         assert!(active_region(&[0, 0]).is_empty());
         assert_eq!(active_region(&[2, 3]), [2, 3]);
+        assert_eq!(active_region(&[0, 1, 0, 0, 2]), [1]);
+        assert!(active_region(&[]).is_empty());
     }
     #[test]
     fn b_peek_keeps_the_delimiter() {
         assert_eq!(digit_prefix("12🦀3"), ("12".into(), "🦀3".into()));
         assert_eq!(digit_prefix("x9"), ("".into(), "x9".into()));
         assert_eq!(digit_prefix(""), ("".into(), "".into()));
+        assert_eq!(digit_prefix("4٣"), ("4".into(), "٣".into()));
+        assert_eq!(digit_prefix("007"), ("007".into(), "".into()));
     }
     #[test]
     fn c_by_ref_borrows_instead_of_consuming_the_iterator() {
@@ -63,5 +70,35 @@ mod tests {
         let mut fused = source.fuse();
         assert_eq!(split_two(fused.by_ref()), (vec![1], vec![]));
         assert_eq!(fused.next(), None);
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    /// A wrong prediction is useful: read the failure, then explain it in NOTES.md.
+    #[test]
+    fn p_predictions() {
+        // P1. take_while through by_ref: (what it collects, what next() returns after).
+        let mut it = [1, 2, 0, 3].into_iter();
+        let head: Vec<i32> = it.by_ref().take_while(|&n| n != 0).collect();
+        let p1: (Vec<i32>, Option<i32>) = guess();
+        assert_eq!(
+            p1,
+            (head, it.next()),
+            "P1: take_while consumes the item that stops it"
+        );
+
+        // P2. How many items survive skip_while(is zero)?
+        let survivors = [0, 1, 0, 2].iter().skip_while(|&&n| n == 0).count();
+        let p2: usize = guess();
+        assert_eq!(p2, survivors, "P2: skip_while only skips the leading run");
+
+        // P3. A source that is not fused: three calls to next().
+        let mut n = 0;
+        let mut flaky = std::iter::from_fn(|| {
+            n += 1;
+            (n != 2).then_some(n)
+        });
+        let calls = (flaky.next(), flaky.next(), flaky.next());
+        let p3: (Option<i32>, Option<i32>, Option<i32>) = guess();
+        assert_eq!(p3, calls, "P3: None once does not mean None forever");
     }
 }

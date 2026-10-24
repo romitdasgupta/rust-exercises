@@ -1,8 +1,9 @@
 //! LESSON 06 — Accumulators, extrema, and sequence comparisons
 //! Run: cargo test --test chapter15 l06_
 //!
-//! PREDICT before executing: What do sum and product return for empty input? Are any([])
-//! and all([]) true or false? Are iterator comparisons lexicographic?
+//! PREDICT before running: first answer `p_predictions` at the bottom (replace each
+//! `guess()` with your answer). Then consider: What do sum and product return for empty
+//! input? Are any([]) and all([]) true or false? Are iterator comparisons lexicographic?
 //!
 //! IMPLEMENT the documented tasks, then keep the tests and add an edge case.
 //! EXPLAIN afterward: Why must an extrema function specify tie behavior? How do max_by_key
@@ -40,10 +41,12 @@ fn compare(left: &[i32], right: &[i32]) -> std::cmp::Ordering {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use practice::guess;
     #[test]
     fn a_empty_identities_and_wide_accumulation() {
         assert_eq!(totals(&[]), (0, 0, 1));
         assert_eq!(totals(&[2, -3, 4]), (3, 3, -24));
+        assert_eq!(totals(&[0, 9]), (2, 9, 0));
     }
     #[test]
     fn b_key_extremum_uses_first_tie() {
@@ -62,5 +65,44 @@ mod tests {
         assert_eq!(compare(&[1, 3], &[1, 2, 100]), Greater);
         assert_eq!(compare(&[1], &[1, 0]), Less);
         assert_eq!(compare(&[], &[]), Equal);
+        assert_eq!(compare(&[-1], &[0]), Less);
+        assert_eq!(compare(&[], &[i32::MIN]), Less);
+    }
+
+    /// P. Predict BEFORE running: replace each `guess()` with your answer.
+    /// A wrong prediction is useful: read the failure, then explain it in NOTES.md.
+    #[test]
+    fn p_predictions() {
+        // P1. Over an empty slice: (sum, product, max).
+        let empty: [i32; 0] = [];
+        let p1: (i32, i32, Option<i32>) = guess();
+        assert_eq!(
+            p1,
+            (
+                empty.iter().sum(),
+                empty.iter().product(),
+                empty.iter().copied().max()
+            ),
+            "P1: identities and the empty extremum"
+        );
+
+        // P2. Ties on length: (max_by_key's choice, min_by_key's choice).
+        let words = ["bb", "a", "cc", "d"];
+        let longest = words.iter().max_by_key(|w| w.len()).copied();
+        let shortest = words.iter().min_by_key(|w| w.len()).copied();
+        let p2: (Option<&str>, Option<&str>) = guess();
+        assert_eq!(p2, (longest, shortest), "P2: which tie wins");
+
+        // P3. ([1, 2] < [1, 2, 0] as iterators, any over empty, all over empty)
+        let p3: (bool, bool, bool) = guess();
+        assert_eq!(
+            p3,
+            (
+                [1, 2].iter().lt([1, 2, 0].iter()),
+                empty.iter().any(|&n| n > 0),
+                empty.iter().all(|&n| n > 0)
+            ),
+            "P3: prefixes and vacuous truth"
+        );
     }
 }
