@@ -64,7 +64,7 @@ For every lesson, keep the two hints and add a third block, `<details><summary>C
 
 ## Chapter README
 
-Replace "Work through the chapter" (or its equivalent) with the Chapter 4 version, adjusted for the chapter number. Add rows for R01, C01, and the drills to the lesson table, and `cargo clippy --test chapterNN` and `cargo drill chNN` to the command block. Keep the coverage map and the mastery check.
+Replace "Work through the chapter" (or its equivalent) with the Chapter 4 version, adjusted for the chapter number. Add rows for R01, C01, and the drills to the lesson table, and `cargo clippy --test chapterNN` and `cargo drill chNN` to the command block. Keep the coverage map (Chapter 3 has an outcomes column in its lesson table instead) and the mastery check.
 
 ## NOTES.md
 

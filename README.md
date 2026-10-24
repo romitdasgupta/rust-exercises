@@ -128,6 +128,10 @@ cargo test --release --test chapter04
 
 cargo clippy --test chapter04
 cargo fmt --check
+
+# Compiler drills and progress (see "Tools at a glance").
+cargo drill ch04
+cargo progress
 ```
 
 Unimplemented functions deliberately panic at `todo!()`, and unanswered predictions at `guess()`. A failing exercise is the starting state, not a broken installation. Do not run the whole book's tests expecting a green result before completing the exercises. Compiler labs deliberately include snippets that should fail to compile; keep those experiments in the scratch files or isolated lab projects and restore them afterward.
@@ -165,13 +169,13 @@ For unsafe and FFI work, satisfy the supplied safety contracts and explain them 
 
 ## How to judge mastery
 
-A green test result checks the required behavior. It does not prove that you used the intended technique or can explain the design. Use each chapter's coverage table and mastery questions as a second checklist. Be ready to describe ownership, invariants, error behavior, and edge cases, then solve a changed version of the problem without copying your solution.
+A green test result checks the required behavior, and technique tests catch many wrong approaches, such as extra clones, sequential versions of concurrent tasks, or missed borrows. Tests still cannot prove you understand the design or can explain it. Use each chapter's coverage table, mastery questions, and your NOTES.md as a second checklist, and keep up the spaced reviews that `cargo progress` schedules. Be ready to describe ownership, invariants, error behavior, and edge cases, then solve a changed version of the problem without copying your solution.
 
 ## Validation scope
 
 A clean starter checkout should compile all 22 chapter targets (3–24) and their scratch examples offline in debug and release profiles using the fresh-clone commands above. Formatting is checked separately. The isolated random, regex, external macro-consumer, production-crates, and loglens packages have their own manifests and are not included in the root Cargo checks. The random, regex, and production-crates packages need a dependency download before offline builds work. The [starter CI workflow](.github/workflows/ci.yml) checks formatting and clippy, runs the coach's own tests, and compiles the core (including the playground) and every extension package in both profiles on Linux, macOS, and Windows; it deliberately does not execute unfinished exercises.
 
-Running unfinished tests is expected to fail. Compilation checks establish that a learner can start; they do not establish that unfinished implementations are correct. No complete reference solution is shipped. Tests also do not prove that an unsafe abstraction is sound for every possible caller: its written safety argument is part of the exercise.
+Running unfinished tests is expected to fail. Compilation checks establish that a learner can start; they do not establish that unfinished implementations are correct. Each chapter, the loglens project, and the production-crates track were checked against a full reference solution in debug and release builds (on Linux), but no reference solution is shipped. [AUTHORING.md](AUTHORING.md) describes that check for new lessons. Tests also do not prove that an unsafe abstraction is sound for every possible caller: its written safety argument is part of the exercise.
 
 Compiler experiments and the assigned Cargo/process, Tokio, Mio, Rayon, compression, procedural-macro, generic gap-buffer, Miri, native C/libgit2, and platform-specific projects are manual practice. They are outside the automated core checks. Their prerequisites and acceptance criteria are stated in the chapter guides or lab instructions.
 

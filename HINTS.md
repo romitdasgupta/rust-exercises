@@ -1,6 +1,6 @@
 # Hints by chapter
 
-Open only the chapter and lesson you are working on. Each lesson has two hint levels; try the first before revealing the second.
+Open only the chapter and lesson you are working on. Each lesson has two hint levels; try the first before revealing the second. After writing your own explanation in the chapter's NOTES.md, compare it with *Check your explanation*. Each chapter's hints also cover its review (R01) and code-review (C01) lessons, and explain every compiler drill.
 
 - [03 · Fundamental Types](exercises/chapter03/HINTS.md)
 - [04 · Ownership and Moves](exercises/chapter04/HINTS.md)
